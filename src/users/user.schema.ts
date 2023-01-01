@@ -1,18 +1,25 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {HydratedDocument} from "mongoose";
+import {generateSnowflake} from "../utils/generate-snowflake.util";
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({
+    timestamps: true,
+})
 export class User {
     @Prop({
-        required: true,
+        default: generateSnowflake()
     })
+    _id: string;
+
+    @Prop({required: true})
     email: string;
 
-    @Prop()
+    @Prop({required: true})
     username: string;
 
     @Prop()
@@ -41,7 +48,7 @@ UserSchema.methods.generateAuthToken = async function () {
 UserSchema.pre("save", async function (next) {
     const user = this;
 
-    if(user.isModified("password")) {
+    if (user.isModified("password")) {
         user.password = await bcrypt.hash(user.password, +process.env.HASH_ROUNDS);
     }
 
