@@ -1,23 +1,38 @@
-import cluster from "node:cluster";
-import dayjs from "dayjs";
+import * as _cluster from "cluster";
+import * as dayjs from "dayjs";
+import { Injectable } from '@nestjs/common';
 
-const talkIoEpoch = 1672534800000;
-let lastSnowflake: string;
-let increment = 0;
+const cluster = _cluster as any;
 
-const addPadding = (num: number, by: number) => num.toString(2).padStart(by, "0");
-const getIncrement = (add: number) => addPadding(increment + add, 12);
+@Injectable()
+export class SnowflakeGenerator {
+    private readonly talkIoEpoch: number = 1672534800000;
+    private lastSnowflake: string;
+    private increment: number = 0;
 
-export const generateSnowflake = () => {
-    const timeSince = addPadding(dayjs().millisecond() - talkIoEpoch, 42);
-    const workerID = addPadding(cluster.worker.id, 5);
-    const processID = addPadding(process.pid, 5);
+    private _addPadding(num: number, by: number): string {
+        return num.toString(2).padStart(by, "0");
+    }
 
-    let snowflake = `${timeSince}${workerID}${processID}${getIncrement(0)}`;
-    if(snowflake === lastSnowflake) snowflake = `${timeSince}${workerID}${processID}${getIncrement(1)}`;
+    private _getIncrement(add: number): string {
+        return this._addPadding(this.increment + add, 12);
+    }
 
-    lastSnowflake = snowflake;
-    increment = increment === 4095 ? 0 : increment + 1;
+    public generateSnowflake(): string {
+        const timeSince = this._addPadding(Date.now() - this.talkIoEpoch, 42);
+        const workerID = this._addPadding(cluster?.worker?.id || 0, 5);
+        const processID = this._addPadding(process.pid, 5);
 
-    return snowflake;
+        let snowflake = `0b${timeSince}${workerID}${processID}${this._getIncrement(0)}`;
+        if (snowflake === this.lastSnowflake) {
+            snowflake = `0b${timeSince}${workerID}${processID}${this._getIncrement(1)}`;
+        }
+
+        console.log(this._getIncrement(0), this._getIncrement(1));
+
+        this.lastSnowflake = snowflake;
+        this.increment = this.increment === 4095 ? 0 : this.increment + 1;
+
+        return BigInt(snowflake).toString();
+    }
 }

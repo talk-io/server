@@ -1,18 +1,18 @@
 import {Expose} from "class-transformer";
 
-export class UserDto {
+export class MessageDto {
     @Expose()
     id: string;
 
     @Expose()
-    username: string;
+    authorID: string;
 
     @Expose()
-    email: string;
+    channelID: string;
 
     @Expose()
-    token: string;
+    guildID: string;
 
     @Expose()
-    discriminator: string;
+    content: string;
 }

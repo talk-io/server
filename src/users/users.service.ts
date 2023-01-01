@@ -1,18 +1,21 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Inject, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument} from "./user.schema";
 import {Error, Model, MongooseError} from "mongoose";
 import {CreateUserDto} from "./dtos/create-user.dto";
 import {LoginUserDto} from "./dtos/login-user.dto";
 import {CurrentUserType} from "./decorators/current-user.decorator";
-
+import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
 const bcrypt = require("bcrypt");
 
 export type LoggedInUser = User & { token: string }
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {
+    constructor(
+        @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+        @Inject(SnowflakeGenerator) private readonly snowflakeGenerator: SnowflakeGenerator
+    ) {
     }
 
     private async _generateDiscriminator(username) {
@@ -38,6 +41,7 @@ export class UsersService {
         newUser.discriminator = await this._generateDiscriminator(user.username);
 
         const token = await newUser.generateAuthToken();
+        newUser.set('id', this.snowflakeGenerator.generateSnowflake());
 
         await newUser.save();
 
