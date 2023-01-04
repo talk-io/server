@@ -1,4 +1,4 @@
-import {BadRequestException, Inject, Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Inject, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument} from "./user.schema";
 import {Error, Model, MongooseError} from "mongoose";
@@ -6,6 +6,7 @@ import {CreateUserDto} from "./dtos/create-user.dto";
 import {LoginUserDto} from "./dtos/login-user.dto";
 import {CurrentUserType} from "./decorators/current-user.decorator";
 import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
+
 const bcrypt = require("bcrypt");
 
 export type LoggedInUser = User & { token: string }
@@ -50,13 +51,13 @@ export class UsersService {
 
     async login(loginData: LoginUserDto): Promise<LoggedInUser> {
         const user = await this.userModel.findOne({email: loginData.email});
-        if (!user) throw new NotFoundException("The email is not registered!");
+        if (!user) throw new BadRequestException("The email is not registered!");
 
         const isPasswordCorrect = await bcrypt.compare(loginData.password, user.password);
         if (!isPasswordCorrect) throw new BadRequestException("The given password is incorrect!");
 
         const token = await user.generateAuthToken();
-        return {...user, token}
+        return {...(user.toObject()), token};
     }
 
     async findOne(userId: string) {

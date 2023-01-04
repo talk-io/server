@@ -13,11 +13,11 @@ export class AppClusterService {
             for (let i = 0; i < cpuCount; i++) cluster.fork();
 
             cluster.on("exit", (worker, code, signal) => {
-                console.log(`Worker \`${worker.process.pid}\` died!`);
+                console.log(`Slave \`${worker.process.pid}\` died!`);
                 cluster.fork();
             });
         } else {
-            console.log(`Worker started on \`${process.pid}\``);
+            console.log(`Slave process started on \`${process.pid}\``);
             return callback();
         }
     }

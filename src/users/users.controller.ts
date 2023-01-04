@@ -6,17 +6,21 @@ import {UserDto} from "./dtos/user.dto";
 import {AuthGuard} from "../guards/auth.guard";
 import {CurrentUser, CurrentUserType} from "./decorators/current-user.decorator";
 import {LoginUserDto} from "./dtos/login-user.dto";
+import {Timeout} from "../interceptors/timeout.interceptor";
 
 @Controller('auth')
+// @Timeout(5)
 @Serialize(UserDto)
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+    constructor(private readonly usersService: UsersService) {
+    }
 
     @Post("/signup")
     async create(@Body() user: CreateUserDto) {
         return this.usersService.create(user);
     }
 
+    @HttpCode(200)
     @Post("/login")
     async login(@Body() user: LoginUserDto) {
         return this.usersService.login(user)
@@ -25,7 +29,7 @@ export class UsersController {
     @UseGuards(AuthGuard)
     @Get("/me")
     async findMe(@CurrentUser("_id") userID: string) {
-        return this.usersService.findOne(userID);
+        return this.usersService.findOne(userID)
     }
 
     @UseGuards(AuthGuard)
