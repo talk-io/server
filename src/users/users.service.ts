@@ -4,7 +4,7 @@ import {User, UserDocument} from "./user.schema";
 import {Error, Model, MongooseError} from "mongoose";
 import {CreateUserDto} from "./dtos/create-user.dto";
 import {LoginUserDto} from "./dtos/login-user.dto";
-import {CurrentUserType} from "./decorators/current-user.decorator";
+import {CurrentUserType} from "../decorators/current-user.decorator";
 import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
 
 const bcrypt = require("bcrypt");
@@ -41,8 +41,8 @@ export class UsersService {
         const newUser = new this.userModel(user);
         newUser.discriminator = await this._generateDiscriminator(user.username);
 
+        newUser.set('_id', this.snowflakeGenerator.generateSnowflake());
         const token = await newUser.generateAuthToken();
-        newUser.set('id', this.snowflakeGenerator.generateSnowflake());
 
         await newUser.save();
 

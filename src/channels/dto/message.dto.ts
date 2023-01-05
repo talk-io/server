@@ -2,7 +2,7 @@ import {Expose} from "class-transformer";
 
 export class MessageDto {
     @Expose()
-    id: string;
+    _id: string;
 
     @Expose()
     authorID: string;

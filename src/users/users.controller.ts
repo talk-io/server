@@ -4,7 +4,7 @@ import {UsersService} from "./users.service";
 import {Serialize} from "../interceptors/serialize.interceptor";
 import {UserDto} from "./dtos/user.dto";
 import {AuthGuard} from "../guards/auth.guard";
-import {CurrentUser, CurrentUserType} from "./decorators/current-user.decorator";
+import {CurrentUser, CurrentUserType} from "../decorators/current-user.decorator";
 import {LoginUserDto} from "./dtos/login-user.dto";
 import {Timeout} from "../interceptors/timeout.interceptor";
 
