@@ -1,4 +1,4 @@
-import {Body, Controller, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Param, Post, UseGuards} from "@nestjs/common";
 import { CreateGuildDto } from "./dto/create-guild.dto";
 import { GuildsService } from "./guilds.service";
 import { AuthGuard } from "../guards/auth.guard";
@@ -21,5 +21,10 @@ export class GuildsController {
     @CurrentUser() user: CurrentUserType
   ) {
     return this.guildsService.create(createGuildDto, user);
+  }
+
+  @Post("/:serverID")
+  async join(@Param("serverID") serverID: string, @CurrentUser() user: CurrentUserType) {
+    return this.guildsService.join(serverID, user);
   }
 }

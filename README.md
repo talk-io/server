@@ -19,3 +19,6 @@ Basic Scripts
 
 - Build Project
 <pre><code>pnpm build</code></pre>
+
+### Postman Collection
+You can find the postman collection for this project [here](https://www.postman.com/mightykillrr/workspace/talkio/overview)

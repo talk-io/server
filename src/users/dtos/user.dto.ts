@@ -1,4 +1,6 @@
-import {Expose} from "class-transformer";
+import {Expose, Type} from "class-transformer";
+import {Guild} from "../../guilds/guild.schema";
+import {BasicGuildDto} from "../../guilds/dto/basic-guild.dto";
 
 export class UserDto {
     @Expose()
@@ -15,4 +17,8 @@ export class UserDto {
 
     @Expose()
     discriminator: string;
+
+    @Expose()
+    @Type(() => BasicGuildDto)
+    guilds: Array<Guild>;
 }

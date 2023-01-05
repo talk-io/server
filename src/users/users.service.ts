@@ -61,7 +61,7 @@ export class UsersService {
     }
 
     async findOne(userId: string) {
-        return this.userModel.findById(userId)
+        return this.userModel.findById(userId).populate("guilds");
     }
 
     async signOut(currentUser: CurrentUserType) {

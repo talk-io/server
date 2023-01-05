@@ -12,9 +12,7 @@ export type UserDocument = HydratedDocument<User>;
   _id: false,
 })
 export class User {
-  @Prop({
-    index: true,
-  })
+  @Prop({ index: true })
   _id: string;
 
   @Prop({ required: true, index: true })
@@ -32,11 +30,8 @@ export class User {
   @Prop()
   tokens: Array<string>;
 
-  @Prop({
-    type: String,
-    ref: "Guild",
-  })
-  guilds: Array<Guild>;
+  @Prop([{ type: String, ref: "Guild" }])
+  guilds: Array<string>;
 
   generateAuthToken: () => Promise<string>;
 }
