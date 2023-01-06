@@ -9,7 +9,7 @@ import {
 import { Serialize } from "../interceptors/serialize.interceptor";
 import { GuildDto } from "./dto/guild.dto";
 
-@Controller("guilds")
+@Controller()
 @UseGuards(AuthGuard)
 @Serialize(GuildDto)
 export class GuildsController {

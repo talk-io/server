@@ -18,7 +18,7 @@ export class GuildsService {
   async create(guild: CreateGuildDto, user: CurrentUserType) {
     const newGuild = new this.guildModel(guild);
 
-    newGuild.set('_id', this.snowflakeGenerator.generateSnowflake());
+    newGuild._id = this.snowflakeGenerator.generateSnowflake()
     newGuild.set('owner', user._id);
 
     await newGuild.save();

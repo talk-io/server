@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Guild } from "../guilds/guild.schema";
+import { Guild } from "../guild.schema";
 
 @Schema({
   timestamps: true,

@@ -28,8 +28,6 @@ export class SnowflakeGenerator {
             snowflake = `0b${timeSince}${workerID}${processID}${this._getIncrement(1)}`;
         }
 
-        console.log(this._getIncrement(0), this._getIncrement(1));
-
         this.lastSnowflake = snowflake;
         this.increment = this.increment === 4095 ? 0 : this.increment + 1;
 

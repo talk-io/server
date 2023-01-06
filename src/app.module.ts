@@ -1,17 +1,29 @@
 import { Module, ValidationPipe } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
 import { MongooseModule } from "@nestjs/mongoose";
-import { APP_PIPE } from "@nestjs/core";
+import { APP_PIPE, RouterModule } from "@nestjs/core";
 import { SnowflakeGenerator } from "./utils/generate-snowflake.util";
-import { ChannelsModule } from "./channels/channels.module";
+import { ChannelsModule } from "./guilds/channels/channels.module";
 import { GuildsModule } from "./guilds/guilds.module";
 
 @Module({
   imports: [
     MongooseModule.forRoot("mongodb://127.0.0.1:27017/talkio"),
     UsersModule,
-    ChannelsModule,
     GuildsModule,
+    ChannelsModule,
+    RouterModule.register([
+      {
+        path: "/guilds",
+        module: GuildsModule,
+        children: [
+          {
+            path: ":guildID/channels",
+            module: ChannelsModule,
+          },
+        ],
+      },
+    ]),
   ],
   providers: [
     {

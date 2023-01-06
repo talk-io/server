@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import {User, UserSchema} from "../users/user.schema";
-import {Channel, ChannelSchema} from "../channels/channel.schema";
+import {Channel, ChannelSchema} from "./channels/channel.schema";
 import {HydratedDocument, Types} from "mongoose";
 
 export type GuildDocument = HydratedDocument<Guild>;

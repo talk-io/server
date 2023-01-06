@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ChannelsService } from "./channels.service";
 import { ChannelsGateway } from "./channels.gateway";
 import { ChannelsController } from "./channels.controller";
-import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
+import { SnowflakeGenerator } from "../../utils/generate-snowflake.util";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Message, MessageSchema } from "./message.schema";
 import { Channel, ChannelSchema } from "./channel.schema";
