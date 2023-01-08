@@ -2,9 +2,9 @@ import { Module, ValidationPipe } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { APP_PIPE, RouterModule } from "@nestjs/core";
-import { SnowflakeGenerator } from "./utils/generate-snowflake.util";
 import { ChannelsModule } from "./guilds/channels/channels.module";
 import { GuildsModule } from "./guilds/guilds.module";
+import {MessagesModule} from "./guilds/channels/messages/messages.module";
 
 @Module({
   imports: [
@@ -20,6 +20,12 @@ import { GuildsModule } from "./guilds/guilds.module";
           {
             path: ":guildID/channels",
             module: ChannelsModule,
+            children: [
+              {
+                path: ":channelID/messages",
+                module: MessagesModule
+              }
+            ]
           },
         ],
       },
@@ -41,8 +47,7 @@ import { GuildsModule } from "./guilds/guilds.module";
         // }
       }),
     },
-    SnowflakeGenerator,
   ],
-  exports: [SnowflakeGenerator],
+  exports: [],
 })
 export class AppModule {}

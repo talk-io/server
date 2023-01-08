@@ -1,7 +1,7 @@
 import {CanActivate, ExecutionContext, UnauthorizedException} from "@nestjs/common";
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument} from "../users/user.schema";
-import {Model} from "mongoose";
+import {Model} from "mongoose";``
 
 const jwt = require("jsonwebtoken");
 

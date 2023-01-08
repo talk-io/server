@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { Guild } from "../guilds/guild.schema";
+import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -12,7 +13,10 @@ export type UserDocument = HydratedDocument<User>;
   _id: false,
 })
 export class User {
-  @Prop({ index: true })
+  @Prop({
+    index: true,
+    default: () => new SnowflakeGenerator().generateSnowflake()
+  })
   _id: string;
 
   @Prop({ required: true, index: true })

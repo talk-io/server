@@ -15,7 +15,6 @@ export type LoggedInUser = User & { token: string }
 export class UsersService {
     constructor(
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-        @Inject(SnowflakeGenerator) private readonly snowflakeGenerator: SnowflakeGenerator
     ) {
     }
 
@@ -41,7 +40,6 @@ export class UsersService {
         const newUser = new this.userModel(user);
         newUser.discriminator = await this._generateDiscriminator(user.username);
 
-        newUser.set('_id', this.snowflakeGenerator.generateSnowflake());
         const token = await newUser.generateAuthToken();
 
         await newUser.save();

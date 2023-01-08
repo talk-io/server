@@ -1,4 +1,4 @@
-export enum Channel {
+export enum ChannelType {
   DM,
   GROUP_DM,
   GUILD_TEXT,

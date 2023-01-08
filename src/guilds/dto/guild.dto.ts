@@ -1,7 +1,8 @@
 import { UserDto } from "../../users/dtos/user.dto";
 import { Expose, Type } from "class-transformer";
 import { User } from "../../users/user.schema";
-import {GuildUserDto} from "../../users/dtos/guild-user.dto";
+import { GuildUserDto } from "../../users/dtos/guild-user.dto";
+import {ChannelDto} from "../channels/dto/channel.dto";
 
 export class GuildDto {
   @Expose()
@@ -20,4 +21,8 @@ export class GuildDto {
   @Expose()
   @Type(() => GuildUserDto)
   members: Array<User>;
+
+  @Expose()
+  @Type(() => ChannelDto)
+  channels: Array<string>;
 }

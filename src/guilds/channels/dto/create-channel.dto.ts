@@ -1,14 +1,14 @@
 import {IsEnum, IsNotEmpty, IsString, ValidateIf} from "class-validator";
-import { Channel } from "../../../types/channel.type";
+import {ChannelType} from "../../../types/channel.type";
 
 export class CreateChannelDto {
   @IsString()
   name: string;
 
-  @IsEnum(Channel)
-  type: string;
+  @IsEnum(ChannelType)
+  type: ChannelType;
 
-  @ValidateIf((o) => o.type !== Channel.GUILD_CATEGORY)
+  @ValidateIf((o) => o.type !== ChannelType.GUILD_CATEGORY)
   @IsNotEmpty()
   parentID: string;
 }

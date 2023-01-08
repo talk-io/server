@@ -1,26 +1,37 @@
 import { Module } from "@nestjs/common";
 import { ChannelsService } from "./channels.service";
-import { ChannelsGateway } from "./channels.gateway";
 import { ChannelsController } from "./channels.controller";
-import { SnowflakeGenerator } from "../../utils/generate-snowflake.util";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Message, MessageSchema } from "./message.schema";
 import { Channel, ChannelSchema } from "./channel.schema";
+import { User, UserSchema } from "../../users/user.schema";
+import { MessagesModule } from "./messages/messages.module";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: Message.name,
-        schema: MessageSchema,
-      },
+    MongooseModule.forFeatureAsync([
       {
         name: Channel.name,
-        schema: ChannelSchema,
+        useFactory: () => {
+          const schema = ChannelSchema;
+
+          // Add Position
+          schema.pre("validate", async function (next) {
+            if (this.isNew) this.position = await this.addPosition.bind(this)();
+            return next();
+          });
+
+          return schema;
+        },
+      },
+    ]),
+    MongooseModule.forFeature([
+      {
+        name: User.name,
+        schema: UserSchema,
       },
     ]),
   ],
-  providers: [ChannelsGateway, ChannelsService, SnowflakeGenerator],
+  providers: [ChannelsService],
   controllers: [ChannelsController],
 })
 export class ChannelsModule {}
