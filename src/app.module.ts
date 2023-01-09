@@ -4,7 +4,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { APP_PIPE, RouterModule } from "@nestjs/core";
 import { ChannelsModule } from "./guilds/channels/channels.module";
 import { GuildsModule } from "./guilds/guilds.module";
-import {MessagesModule} from "./guilds/channels/messages/messages.module";
+import { MessagesModule } from "./guilds/channels/messages/messages.module";
 
 @Module({
   imports: [
@@ -12,6 +12,7 @@ import {MessagesModule} from "./guilds/channels/messages/messages.module";
     UsersModule,
     GuildsModule,
     ChannelsModule,
+    MessagesModule,
     RouterModule.register([
       {
         path: "/guilds",
@@ -20,14 +21,12 @@ import {MessagesModule} from "./guilds/channels/messages/messages.module";
           {
             path: ":guildID/channels",
             module: ChannelsModule,
-            children: [
-              {
-                path: ":channelID/messages",
-                module: MessagesModule
-              }
-            ]
           },
         ],
+      },
+      {
+        path: "/channels/:channelID/messages",
+        module: MessagesModule,
       },
     ]),
   ],

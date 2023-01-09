@@ -8,8 +8,5 @@ export class GuildUserDto {
     username: string;
 
     @Expose()
-    email: string;
-
-    @Expose()
     discriminator: string;
 }

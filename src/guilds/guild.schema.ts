@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { User } from "../users/user.schema";
+import { User, UserDocument } from "../users/user.schema";
 import { Channel, ChannelDocument } from "./channels/channel.schema";
 import { HydratedDocument, Model } from "mongoose";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
@@ -34,24 +34,30 @@ export class Guild {
   })
   description: string;
 
-  @Prop({
-    type: [{ type: String, ref: "User" }],
-  })
-  members: Array<string>;
-
-  @Prop({
-    type: [{ type: String, ref: "Channel" }],
-  })
-  channels: Array<string>;
-
-  addDefaultChannels: () => Promise<Array<string>>;
+  addDefaultChannels: () => Promise<void>;
 }
 
 export const GuildSchema = SchemaFactory.createForClass(Guild);
 
-GuildSchema.methods.addDefaultChannels = async function (): Promise<
-  Array<string>
-> {
+GuildSchema.virtual("members", {
+  ref: "User",
+  localField: "_id",
+  foreignField: "guilds",
+  limit: 50,
+});
+
+GuildSchema.virtual("channels", {
+  ref: "Channel",
+  localField: "_id",
+  foreignField: "guildID",
+});
+
+// GuildSchema.virtual("membersCount", {
+//   ref: "User",
+//   local
+// })
+
+GuildSchema.methods.addDefaultChannels = async function (): Promise<void> {
   const guild = this;
   if (!guild.isNew) return;
 
@@ -84,8 +90,7 @@ GuildSchema.methods.addDefaultChannels = async function (): Promise<
     });
     return [savedCategory, ...(await Promise.all(categoryChildren))];
   });
-  const arrayWithChannels = await Promise.all(channels);
-  return arrayWithChannels.flat().map((channel) => channel._id);
+  await Promise.all(channels);
 };
 
 const defaultChannels = [

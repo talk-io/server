@@ -1,11 +1,9 @@
 import { Module } from "@nestjs/common";
 import { GuildsController } from "./guilds.controller";
 import { GuildsService } from "./guilds.service";
-import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "../users/user.schema";
 import { Guild, GuildSchema } from "./guild.schema";
-import { ChannelType } from "../types/channel.type";
 
 @Module({
   imports: [
@@ -32,6 +30,6 @@ import { ChannelType } from "../types/channel.type";
     ]),
   ],
   controllers: [GuildsController],
-  providers: [GuildsService, SnowflakeGenerator],
+  providers: [GuildsService],
 })
 export class GuildsModule {}

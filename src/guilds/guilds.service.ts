@@ -23,19 +23,17 @@ export class GuildsService {
 
     // Set the owner of the guild to the current user
     newGuild.set("owner", user._id);
-    // Add the current user to the guild's members
-    newGuild.members.push(user._id);
 
     const currentUser = await this.userModel.findById(user._id);
     // Add the guild to the current user's guilds
     currentUser.guilds.push(newGuild._id);
 
-    newGuild.channels = await newGuild.addDefaultChannels();
+    await newGuild.addDefaultChannels();
 
     // Create the default channels
     // await this.channelModel.addDefaultChannels(newGuild._id);
 
-    await newGuild.save();
+    await Promise.all([newGuild.save(), currentUser.save()])
     return newGuild.populate(["owner", "channels", "members"]);
   }
 
@@ -44,16 +42,22 @@ export class GuildsService {
     if (!guild)
       throw new NotFoundException("No guild was found with the given ID!");
 
-    const isMember = guild.members.includes(currentUser._id);
-    if (isMember)
-      throw new BadRequestException("You are already a member of this guild!");
-
     const user = await this.userModel.findById(currentUser._id);
+    const isMember = user.guilds.includes(guild._id);
+    if (isMember) {
+      throw new BadRequestException("You are already a member of this guild!");
+    }
     user.guilds.push(guild._id);
-    guild.members.push(user._id);
 
-    await Promise.all([user.save(), guild.save()]);
+    await Promise.all([user.save()]);
 
-    return guild.populate(["owner", "channels", "members"]);
+    return guild.populate(["owner"]);
+  }
+
+  async findOne(guildID: string) {
+    const guild = await this.guildModel.findById(guildID);
+    if(!guild) throw new NotFoundException("Requested Guild was not found!")
+
+    return guild.populate(["members", "owner", "channels"])
   }
 }

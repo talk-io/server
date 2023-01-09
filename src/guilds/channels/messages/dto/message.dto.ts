@@ -1,4 +1,6 @@
-import {Expose} from "class-transformer";
+import {Expose, Type} from "class-transformer";
+import {GuildUserDto} from "../../../../users/dtos/guild-user.dto";
+import {ChannelDto} from "../../dto/channel.dto";
 
 export class MessageDto {
     @Expose()
@@ -11,8 +13,13 @@ export class MessageDto {
     channelID: string;
 
     @Expose()
-    guildID: string;
+    content: string;
 
     @Expose()
-    content: string;
+    @Type(() => ChannelDto)
+    channel: ChannelDto;
+
+    @Expose()
+    @Type(() => GuildUserDto)
+    author: GuildUserDto;
 }
