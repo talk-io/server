@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { Guild } from "../guilds/guild.schema";
-import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
+import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
+import * as dayjs from "dayjs";
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -15,7 +16,7 @@ export type UserDocument = HydratedDocument<User>;
 export class User {
   @Prop({
     index: true,
-    default: () => new SnowflakeGenerator().generateSnowflake()
+    default: () => new SnowflakeGenerator().generateSnowflake(),
   })
   _id: string;
 

@@ -24,10 +24,9 @@ export class Guild {
   name: string;
 
   @Prop({
-    ref: "User",
-    type: String,
+    required: true,
   })
-  owner: string;
+  ownerID: string;
 
   @Prop({
     set: (description: string) => description.trim(),
@@ -44,6 +43,13 @@ GuildSchema.virtual("members", {
   localField: "_id",
   foreignField: "guilds",
   limit: 50,
+});
+
+GuildSchema.virtual("owner", {
+  ref: "User",
+  localField: "ownerID",
+  foreignField: "_id",
+  justOne: true,
 });
 
 GuildSchema.virtual("channels", {

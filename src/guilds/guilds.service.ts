@@ -22,7 +22,7 @@ export class GuildsService {
     const newGuild = new this.guildModel(guild);
 
     // Set the owner of the guild to the current user
-    newGuild.set("owner", user._id);
+    newGuild.set("ownerID", user._id);
 
     const currentUser = await this.userModel.findById(user._id);
     // Add the guild to the current user's guilds
@@ -34,7 +34,7 @@ export class GuildsService {
     // await this.channelModel.addDefaultChannels(newGuild._id);
 
     await Promise.all([newGuild.save(), currentUser.save()])
-    return newGuild.populate(["owner", "channels", "members"]);
+    return newGuild.populate(["owner"]);
   }
 
   async join(serverID: string, currentUser: CurrentUserType) {
@@ -51,13 +51,13 @@ export class GuildsService {
 
     await Promise.all([user.save()]);
 
-    return guild.populate(["owner"]);
+    return guild.populate(["owner", "channels", "members"]);
   }
 
   async findOne(guildID: string) {
     const guild = await this.guildModel.findById(guildID);
     if(!guild) throw new NotFoundException("Requested Guild was not found!")
 
-    return guild.populate(["members", "owner", "channels"])
+    return guild.populate(["owner", "channels", "members"])
   }
 }

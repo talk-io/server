@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Message, MessageDocument } from "./message.schema";
 import { Model } from "mongoose";
 import { CreateMessageDto } from "./dto/create-message.dto";
+import * as dayjs from "dayjs";
 
 @Injectable()
 export class MessagesService {
@@ -21,5 +22,18 @@ export class MessagesService {
     const savedMessage = await createdMessage.save();
 
     return savedMessage.populate(["author", "channel"]);
+  }
+
+  async getAllMessagesInCurrentChannel(
+    channelID: string,
+    limit: number,
+    before: number
+  ) {
+    const time = before ? dayjs.unix(before).toDate() : dayjs().toDate();
+    return this.messageModel
+      .find({ channelID, createdAt: { $lte: time } })
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate(["author"]);
   }
 }

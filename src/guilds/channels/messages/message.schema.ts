@@ -3,7 +3,6 @@ import { User } from "../../../users/user.schema";
 import { Channel } from "../channel.schema";
 import { HydratedDocument } from "mongoose";
 import { SnowflakeGenerator } from "../../../utils/generate-snowflake.util";
-import { Guild } from "../../guild.schema";
 
 @Schema({
   timestamps: true,
@@ -20,8 +19,6 @@ export class Message {
   _id: string;
 
   @Prop({
-    ref: User.name,
-    type: String,
     required: true,
   })
   authorID: string;
@@ -33,8 +30,6 @@ export class Message {
   content: string;
 
   @Prop({
-    ref: Channel.name,
-    type: String,
     required: true,
   })
   channelID: string;
@@ -42,14 +37,16 @@ export class Message {
 export type MessageDocument = HydratedDocument<Message>;
 export const MessageSchema = SchemaFactory.createForClass(Message);
 
-// MessageSchema.virtual("author", {
-//   ref: "User",
-//   localField: "authorID",
-//   foreignField: "_id",
-// });
-//
-// MessageSchema.virtual("channel", {
-//   ref: "Channel",
-//   localField: "channelID",
-//   foreignField: "_id",
-// });
+MessageSchema.virtual("author", {
+  ref: "User",
+  localField: "authorID",
+  foreignField: "_id",
+  justOne: true,
+});
+
+MessageSchema.virtual("channel", {
+  ref: "Channel",
+  localField: "channelID",
+  foreignField: "_id",
+  justOne: true,
+});

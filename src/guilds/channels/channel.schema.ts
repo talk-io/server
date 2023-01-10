@@ -22,7 +22,6 @@ export class Channel {
   name: string;
 
   @Prop({
-    ref: Guild.name,
     required: true,
   })
   guildID: string;
@@ -57,6 +56,20 @@ export class Channel {
 export type ChannelDocument = HydratedDocument<Channel>;
 
 export const ChannelSchema = SchemaFactory.createForClass(Channel);
+
+ChannelSchema.virtual("guild", {
+    ref: "Guild",
+    localField: "guildID",
+    foreignField: "_id",
+    justOne: true,
+});
+
+ChannelSchema.virtual("category", {
+    ref: "Channel",
+    localField: "parentID",
+    foreignField: "_id",
+    justOne: true,
+})
 
 ChannelSchema.methods.addPosition = async function () {
   if (!this.isNew) return;

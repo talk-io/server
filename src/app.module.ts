@@ -8,7 +8,7 @@ import { MessagesModule } from "./guilds/channels/messages/messages.module";
 
 @Module({
   imports: [
-    MongooseModule.forRoot("mongodb://127.0.0.1:27017/talkio"),
+    MongooseModule.forRoot("mongodb://127.0.0.1:27017/talkio", ),
     UsersModule,
     GuildsModule,
     ChannelsModule,

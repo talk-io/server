@@ -20,19 +20,19 @@ import { User, UserSchema } from "../../../users/user.schema";
         useFactory: () => {
           const schema = MessageSchema;
 
-          schema.virtual("channel", {
-            ref: "Channel",
-            localField: "channelID",
-            foreignField: "_id",
-            justOne: true,
-          });
-
-          schema.virtual("author", {
-            ref: "User",
-            localField: "authorID",
-            foreignField: "_id",
-            justOne: true,
-          });
+          // schema.virtual("channel", {
+          //   ref: "Channel",
+          //   localField: "channelID",
+          //   foreignField: "_id",
+          //   justOne: true,
+          // });
+          //
+          // schema.virtual("author", {
+          //   ref: "User",
+          //   localField: "authorID",
+          //   foreignField: "_id",
+          //   justOne: true,
+          // });
 
           return schema;
         },
