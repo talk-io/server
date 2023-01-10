@@ -4,6 +4,7 @@ import { GuildsService } from "./guilds.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "../users/user.schema";
 import { Guild, GuildSchema } from "./guild.schema";
+import { GuildsGateway } from './guilds.gateway';
 
 @Module({
   imports: [
@@ -30,6 +31,6 @@ import { Guild, GuildSchema } from "./guild.schema";
     ]),
   ],
   controllers: [GuildsController],
-  providers: [GuildsService],
+  providers: [GuildsService, GuildsGateway],
 })
 export class GuildsModule {}

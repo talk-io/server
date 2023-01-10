@@ -11,7 +11,6 @@ import { CreateMessageDto } from "./dto/create-message.dto";
 import { MessagesService } from "./messages.service";
 import { AuthGuard } from "../../../guards/auth.guard";
 import { CurrentUser } from "../../../decorators/current-user.decorator";
-import { UserDto } from "../../../users/dtos/user.dto";
 import { Serialize } from "../../../interceptors/serialize.interceptor";
 import { MessageDto } from "./dto/message.dto";
 

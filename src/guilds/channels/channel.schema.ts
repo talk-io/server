@@ -4,6 +4,8 @@ import { HydratedDocument, Model } from "mongoose";
 import { ChannelType } from "../../types/channel.type";
 import { SnowflakeGenerator } from "../../utils/generate-snowflake.util";
 
+export type ChannelDocument = HydratedDocument<Channel>;
+
 @Schema({
   timestamps: true,
   _id: false,
@@ -50,30 +52,28 @@ export class Channel {
   })
   nsfw: boolean;
 
-  addPosition: () => Promise<number>
+  addPosition: () => Promise<number>;
 }
-
-export type ChannelDocument = HydratedDocument<Channel>;
 
 export const ChannelSchema = SchemaFactory.createForClass(Channel);
 
 ChannelSchema.virtual("guild", {
-    ref: "Guild",
-    localField: "guildID",
-    foreignField: "_id",
-    justOne: true,
+  ref: "Guild",
+  localField: "guildID",
+  foreignField: "_id",
+  justOne: true,
 });
 
 ChannelSchema.virtual("category", {
-    ref: "Channel",
-    localField: "parentID",
-    foreignField: "_id",
-    justOne: true,
-})
+  ref: "Channel",
+  localField: "parentID",
+  foreignField: "_id",
+  justOne: true,
+});
 
 ChannelSchema.methods.addPosition = async function () {
   if (!this.isNew) return;
-  if(Object.hasOwn(this.toObject(), "position")) return this.position;
+  if (Object.hasOwn(this.toObject(), "position")) return this.position;
 
   const ChannelObjects = this.$model("Channel");
 
@@ -81,4 +81,4 @@ ChannelSchema.methods.addPosition = async function () {
   const allChannels = await ChannelObjects.find({ guildID, type });
 
   return allChannels.length;
-}
+};

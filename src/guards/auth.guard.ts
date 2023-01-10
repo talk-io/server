@@ -1,32 +1,31 @@
-import {CanActivate, ExecutionContext, UnauthorizedException} from "@nestjs/common";
-import {InjectModel} from "@nestjs/mongoose";
-import {User, UserDocument} from "../users/user.schema";
-import {Model} from "mongoose";``
+import {
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { UsersService } from "../users/users.service";
 
 const jwt = require("jsonwebtoken");
 
 export class AuthGuard implements CanActivate {
-    constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {
+  constructor(private readonly usersService: UsersService) {}
+
+  async canActivate(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest();
+
+    const authorization: string | undefined = request.headers.authorization;
+    if (!authorization) return false;
+
+    const [_, token] = authorization.split(" ");
+
+    try {
+      const user = await this.usersService.verifyUser(token);
+
+      request.currentUser = { _id: user._id, token };
+
+      return !!user;
+    } catch (e) {
+      throw new UnauthorizedException();
     }
-
-    async canActivate(context: ExecutionContext) {
-        const request = context.switchToHttp().getRequest();
-
-        const authorization: string | undefined = request.headers.authorization;
-        if (!authorization) return false;
-
-        const [_, token] = authorization.split(' ');
-
-        try {
-            const payload = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-            const user = await this.userModel.findOne({_id: payload._id, tokens: {$in: [token]}});
-
-            request.currentUser = {_id: payload._id, token};
-
-            return !!user;
-        } catch (e) {
-            throw new UnauthorizedException();
-        }
-
-    }
+  }
 }

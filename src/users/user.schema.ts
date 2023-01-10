@@ -38,6 +38,9 @@ export class User {
   @Prop([{ type: String, ref: "Guild" }])
   guilds: Array<string>;
 
+  @Prop()
+  sessions: Array<string>;
+
   generateAuthToken: () => Promise<string>;
 }
 

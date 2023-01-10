@@ -13,6 +13,8 @@ import { UserDocument } from "../users/user.schema";
 
 @Injectable()
 export class GuildsService {
+  servers: Map<string, Map<string, Array<string>>> = new Map();
+
   constructor(
     @InjectModel("Guild") private readonly guildModel: Model<GuildDocument>,
     @InjectModel("User") private readonly userModel: Model<UserDocument>,

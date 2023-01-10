@@ -3,7 +3,7 @@ import {UsersController} from "./users.controller";
 import {UsersService} from "./users.service";
 import {MongooseModule} from "@nestjs/mongoose";
 import {User, UserSchema} from "./user.schema";
-import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
+import {UsersGateway} from "./users.gateway";
 
 @Module({
     imports: [
@@ -13,7 +13,7 @@ import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
         }]),
     ],
     controllers: [UsersController],
-    providers: [UsersService, SnowflakeGenerator],
+    providers: [UsersService, UsersGateway],
 })
 export class UsersModule {
 }
