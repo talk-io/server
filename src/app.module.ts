@@ -5,10 +5,12 @@ import { APP_PIPE, RouterModule } from "@nestjs/core";
 import { ChannelsModule } from "./guilds/channels/channels.module";
 import { GuildsModule } from "./guilds/guilds.module";
 import { MessagesModule } from "./guilds/channels/messages/messages.module";
+import { ConfigModule } from "@nestjs/config";
+import configuration from "./config/configuration";
 
 @Module({
   imports: [
-    MongooseModule.forRoot("mongodb://127.0.0.1:27017/talkio", ),
+    MongooseModule.forRoot("mongodb://127.0.0.1:27017/talkio"),
     UsersModule,
     GuildsModule,
     ChannelsModule,
@@ -29,24 +31,19 @@ import { MessagesModule } from "./guilds/channels/messages/messages.module";
         module: MessagesModule,
       },
     ]),
+    ConfigModule.forRoot({
+      envFilePath: ".env",
+      isGlobal: true,
+      load: [configuration],
+    }),
   ],
   providers: [
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
-        // exceptionFactory: (errors) => {
-        //     const modifiedErrors = {};
-        //     errors.forEach(error => {
-        //         modifiedErrors[error.property] = Object.values(error.constraints)[0];
-        //     })
-        //     return new BadRequestException({
-        //         message: modifiedErrors,
-        //     });
-        // }
       }),
     },
   ],
-  exports: [],
 })
 export class AppModule {}

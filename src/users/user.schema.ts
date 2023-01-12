@@ -2,10 +2,8 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { Guild } from "../guilds/guild.schema";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
-import * as dayjs from "dayjs";
 
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -46,16 +44,16 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "30d",
-  });
-  user.tokens.push(token);
-
-  await user.save();
-  return token;
-};
+// UserSchema.methods.generateAuthToken = async function () {
+//   const user = this;
+//   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
+//     expiresIn: "30d",
+//   });
+//   user.tokens.push(token);
+//
+//   await user.save();
+//   return token;
+// };
 
 UserSchema.pre("save", async function (next) {
   const user = this;

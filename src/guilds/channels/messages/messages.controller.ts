@@ -9,14 +9,14 @@ import {
 } from "@nestjs/common";
 import { CreateMessageDto } from "./dto/create-message.dto";
 import { MessagesService } from "./messages.service";
-import { AuthGuard } from "../../../guards/auth.guard";
 import { CurrentUser } from "../../../decorators/current-user.decorator";
 import { Serialize } from "../../../interceptors/serialize.interceptor";
 import { MessageDto } from "./dto/message.dto";
+import { JwtAuthGuard } from "../../../guards/auth.guard";
 
 @Controller()
 @Serialize(MessageDto)
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 

@@ -5,6 +5,10 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { Channel, ChannelSchema } from "./channel.schema";
 import { User, UserSchema } from "../../users/user.schema";
 import { MessagesModule } from "./messages/messages.module";
+import { UsersService } from "../../users/users.service";
+import { JwtStrategy } from "../../users/strategies/jwt.strategy";
+import { UsersModule } from "../../users/users.module";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -30,8 +34,9 @@ import { MessagesModule } from "./messages/messages.module";
         schema: UserSchema,
       },
     ]),
+    JwtModule,
   ],
-  providers: [ChannelsService],
+  providers: [ChannelsService, UsersService, JwtStrategy],
   controllers: [ChannelsController],
 })
 export class ChannelsModule {}

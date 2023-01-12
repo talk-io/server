@@ -5,6 +5,10 @@ import { MessagesGateway } from "./messages.gateway";
 import { MessagesService } from "./messages.service";
 import { MessagesController } from "./messages.controller";
 import { User, UserSchema } from "../../../users/user.schema";
+import { UsersService } from "../../../users/users.service";
+import { JwtStrategy } from "../../../users/strategies/jwt.strategy";
+import {UsersModule} from "../../../users/users.module";
+import {JwtModule} from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -38,8 +42,9 @@ import { User, UserSchema } from "../../../users/user.schema";
         },
       },
     ]),
+    JwtModule,
   ],
-  providers: [MessagesGateway, MessagesService],
+  providers: [MessagesGateway, MessagesService, UsersService, JwtStrategy],
   controllers: [MessagesController],
 })
 export class MessagesModule {}

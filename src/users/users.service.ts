@@ -1,20 +1,22 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "./user.schema";
-import { Model } from "mongoose";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { LoginUserDto } from "./dtos/login-user.dto";
-import { CurrentUserType } from "../decorators/current-user.decorator";
+import {BadRequestException, Injectable} from "@nestjs/common";
+import {InjectModel} from "@nestjs/mongoose";
+import {User, UserDocument} from "./user.schema";
+import {Model} from "mongoose";
+import {CreateUserDto} from "./dtos/create-user.dto";
+import {LoginUserDto} from "./dtos/login-user.dto";
+import {CurrentUserType} from "../decorators/current-user.decorator";
+import {JwtService} from "@nestjs/jwt";
+import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
 
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 export type LoggedInUser = User & { token: string };
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly jwtService: JwtService
   ) {}
 
   private async _generateDiscriminator(username) {
@@ -40,7 +42,11 @@ export class UsersService {
     const newUser = new this.userModel(user);
     newUser.discriminator = await this._generateDiscriminator(user.username);
 
-    const token = await newUser.generateAuthToken();
+    newUser._id = new SnowflakeGenerator().generateSnowflake();
+    console.log(newUser._id);
+    const payload = { _id: newUser._id, username: newUser.username };
+    const token = this.jwtService.sign(payload);
+    newUser.tokens.push(token);
 
     await newUser.save();
 
@@ -76,11 +82,18 @@ export class UsersService {
     return;
   }
 
+  public async validateUser(loginData: LoginUserDto) {
+    const user = await this.userModel.findOne({ email: loginData.email });
+    if (!user) throw new BadRequestException("The email is not registered!");
+
+    return bcrypt.compare(loginData.password, user.password);
+  }
+
   public async verifyUser(token: string) {
-    const payload = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const payload = await this.jwtService.verify(token);
     return this.userModel.findOne({
       _id: payload._id,
-      tokens: { $in: [token] },
+      tokens: {$in: [token]},
     });
   }
 }

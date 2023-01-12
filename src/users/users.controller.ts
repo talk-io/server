@@ -3,10 +3,10 @@ import {CreateUserDto} from "./dtos/create-user.dto";
 import {UsersService} from "./users.service";
 import {Serialize} from "../interceptors/serialize.interceptor";
 import {UserDto} from "./dtos/user.dto";
-import {AuthGuard} from "../guards/auth.guard";
 import {CurrentUser, CurrentUserType} from "../decorators/current-user.decorator";
 import {LoginUserDto} from "./dtos/login-user.dto";
 import {Timeout} from "../interceptors/timeout.interceptor";
+import {JwtAuthGuard} from "../guards/auth.guard";
 
 @Controller('auth')
 // @Timeout(5)
@@ -26,13 +26,13 @@ export class UsersController {
         return this.usersService.login(user)
     }
 
-    @UseGuards(AuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Get("/me")
     async findMe(@CurrentUser("_id") userID: string) {
         return this.usersService.findOne(userID)
     }
 
-    @UseGuards(AuthGuard)
+    @UseGuards(JwtAuthGuard)
     @HttpCode(200)
     @Post("/signout")
     async signOut(@CurrentUser() user: CurrentUserType) {

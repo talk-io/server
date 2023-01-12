@@ -1,16 +1,16 @@
-import {Body, Controller, Get, Param, Post, UseGuards} from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { CreateGuildDto } from "./dto/create-guild.dto";
 import { GuildsService } from "./guilds.service";
-import { AuthGuard } from "../guards/auth.guard";
 import {
   CurrentUser,
   CurrentUserType,
 } from "../decorators/current-user.decorator";
 import { Serialize } from "../interceptors/serialize.interceptor";
 import { GuildDto } from "./dto/guild.dto";
+import { JwtAuthGuard } from "../guards/auth.guard";
 
 @Controller()
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 @Serialize(GuildDto)
 export class GuildsController {
   constructor(private readonly guildsService: GuildsService) {}
@@ -24,12 +24,15 @@ export class GuildsController {
   }
 
   @Post("/:guildID")
-  async join(@Param("guildID") guildID: string, @CurrentUser() user: CurrentUserType) {
+  async join(
+    @Param("guildID") guildID: string,
+    @CurrentUser() user: CurrentUserType
+  ) {
     return this.guildsService.join(guildID, user);
   }
-  
+
   @Get("/:guildID")
   async findOne(@Param("guildID") guildID: string) {
-    return this.guildsService.findOne(guildID)
+    return this.guildsService.findOne(guildID);
   }
 }

@@ -1,29 +1,30 @@
 import { IoAdapter } from "@nestjs/platform-socket.io";
-import { INestApplicationContext } from "@nestjs/common";
-import { UsersService } from "../users/users.service";
-import { Server, ServerOptions, Socket } from "socket.io";
+import {INestApplicationContext, Injectable} from "@nestjs/common";
+import { Server, ServerOptions } from "socket.io";
 import { NextFunction } from "express";
-import { UserDocument } from "../users/user.schema";
 import { SocketWithUser } from "../types/socket";
+import { WsException } from "@nestjs/websockets";
+import { JwtService } from "@nestjs/jwt";
 
+@Injectable()
 export class SocketIoAdapter extends IoAdapter {
-  private readonly usersService: UsersService;
   constructor(private readonly app: INestApplicationContext) {
     super(app);
-    this.usersService = app.get(UsersService);
   }
 
   createIOServer(port: number, options?: ServerOptions) {
     const server: Server = super.createIOServer(port, options);
 
-    server.use(verifyUserMiddleware(this.usersService));
+    const jwtService = this.app.get(JwtService)
+
+    server.use(verifyUserMiddleware(jwtService));
 
     return server;
   }
 }
 
 const verifyUserMiddleware =
-  (usersService: UsersService) =>
+  (jwtService: JwtService) =>
   async (socket: SocketWithUser, next: NextFunction) => {
     const { authorization } = socket.handshake.headers;
     const [_, token] = authorization.split(" ");
@@ -31,10 +32,11 @@ const verifyUserMiddleware =
     if (!token) next(new Error("No Token provided!"));
 
     try {
-      socket.user = await usersService.verifyUser(token);
+      socket.user = await jwtService.verify(token);
+      console.log({ user: socket.user });
       next();
     } catch (e) {
       console.log(e);
-      next(new Error("Unauthorized"));
+      next(new WsException("Unauthorized"));
     }
   };
