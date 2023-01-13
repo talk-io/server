@@ -1,14 +1,16 @@
 export namespace Events {
+    export enum GuildUserEvents {
+        JOIN = "guildUserJoin",
+        LEAVE = "guildUserLeave",
+        KICK = "guildUserKick",
+        BAN = "guildUserBan",
+        UNBAN = "guildUserUnban",
+        UPDATE = "guildUserUpdate",
+    }
+
     export enum GuildEvents {
-        GET_GUILDS = 'getGuilds',
-        GET_GUILD = 'getGuild',
-        GUILD_CREATED = 'guildCreated',
-        GUILD_JOINED = 'guildJoined',
-        GUILD_LEFT = 'guildLeft',
         GUILD_UPDATED = 'guildUpdated',
         GUILD_DELETED = 'guildDeleted',
-        GUILD_MEMBER_ADDED = 'guildMemberAdded',
-        GUILD_MEMBER_REMOVED = 'guildMemberRemoved',
     }
 
     export enum ChannelEvents {

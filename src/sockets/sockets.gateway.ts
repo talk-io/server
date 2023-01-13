@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -7,9 +8,7 @@ import {
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { SocketWithUser } from "../types/socket";
-import { UsersService } from "../users/users.service";
-import { UseGuards } from "@nestjs/common";
-import {SocketsService} from "./sockets.service";
+import { SocketsService } from "./sockets.service";
 
 @WebSocketGateway()
 export class SocketsGateway
@@ -23,15 +22,35 @@ export class SocketsGateway
   }
 
   handleConnection(client: SocketWithUser): void {
-    // join the guilds the user is in
+    const clientID = client.id;
+    const userID = client.user.id;
+    this.socketsService.addUserSocket(client.user.guilds, userID, clientID);
     client.join(client.user.guilds);
-    // console.log(`WS Client with ID: ${client.user._id} connected!`);
   }
 
   handleDisconnect(client: SocketWithUser): void {
-    const sockets = this.io.sockets.sockets;
+    const userID = client.user.id;
+    this.socketsService.removeUserSocket(client.user.guilds, userID);
+    client.user.guilds.forEach((guildID) => {
+      client.leave(guildID);
+    });
+  }
 
-    // console.log(`WS Client with ID: ${client.user._id} disconnected!`);
-    // console.log(`Number of connected clients: ${sockets.size}`);
+  addUserToGuildRoom(
+    guildID: string,
+    userID: string,
+  ) {
+    const clientID = this.socketsService.getUserSockets(guildID, userID);
+    if (!clientID) return false;
+    this.io.sockets.sockets.get(clientID).join(guildID);
+  }
+
+  removeUserFromGuildRoom(
+    guildID: string,
+    userID: string,
+  ) {
+    const clientID = this.socketsService.getUserSockets(guildID, userID);
+    if (!clientID) return false;
+    this.io.sockets.sockets.get(clientID).leave(guildID);
   }
 }

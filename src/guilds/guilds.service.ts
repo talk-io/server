@@ -13,11 +13,10 @@ import { UserDocument } from "../users/user.schema";
 
 @Injectable()
 export class GuildsService {
-  servers: Map<string, Map<string, Array<string>>> = new Map();
 
   constructor(
     @InjectModel("Guild") private readonly guildModel: Model<GuildDocument>,
-    @InjectModel("User") private readonly userModel: Model<UserDocument>,
+    @InjectModel("User") private readonly userModel: Model<UserDocument>
   ) {}
 
   async create(guild: CreateGuildDto, user: CurrentUserType) {
@@ -35,7 +34,7 @@ export class GuildsService {
     // Create the default channels
     // await this.channelModel.addDefaultChannels(newGuild._id);
 
-    await Promise.all([newGuild.save(), currentUser.save()])
+    await Promise.all([newGuild.save(), currentUser.save()]);
     return newGuild.populate(["owner"]);
   }
 
@@ -56,10 +55,18 @@ export class GuildsService {
     return guild.populate(["owner", "channels", "members"]);
   }
 
+  async leave(guildID: string, currentUser: CurrentUserType) {
+    const user = await this.userModel.findById(currentUser._id);
+    if (!user) throw new NotFoundException("Requested User was not found!");
+    user.guilds = user.guilds.filter((guild) => guild.toString() !== guildID);
+    await user.save();
+    return;
+  }
+
   async findOne(guildID: string) {
     const guild = await this.guildModel.findById(guildID);
-    if(!guild) throw new NotFoundException("Requested Guild was not found!")
+    if (!guild) throw new NotFoundException("Requested Guild was not found!");
 
-    return guild.populate(["owner", "channels", "members"])
+    return guild.populate(["owner", "channels", "members"]);
   }
 }

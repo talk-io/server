@@ -18,6 +18,7 @@ import { Server, Socket } from "socket.io";
 import { Events } from "../../../types/events";
 import { SocketsService } from "../../../sockets/sockets.service";
 import { ChannelsService } from "../channels.service";
+import { Channel } from "../channel.schema";
 
 const {
   MessageEvents: { MESSAGE_CREATED },
@@ -47,16 +48,14 @@ export class MessagesController {
       user
     );
 
-    const channel = await this.channelsService.findOne(channelID);
-    const populatedMessage = await message.populate(["author", "channel"]);
-    console.log({ a: channel.guildID });
+    const populatedMessage = await message.populate<{ channel: Channel }>([
+      "author",
+      "channel",
+    ]);
     this.socketsService.socket
-      .to(channel.guildID)
+      .to(populatedMessage.channel.guildID)
       .emit(MESSAGE_CREATED, populatedMessage);
     return populatedMessage;
-    // this.socketsService.socket.e.broadcast
-    //   .to(guildID)
-    //   .emit(MESSAGE_CREATED, await message.populate(["author", "channel"]));
   }
 
   @Get()
