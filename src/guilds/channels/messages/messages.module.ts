@@ -7,8 +7,13 @@ import { MessagesController } from "./messages.controller";
 import { User, UserSchema } from "../../../users/user.schema";
 import { UsersService } from "../../../users/users.service";
 import { JwtStrategy } from "../../../users/strategies/jwt.strategy";
-import {UsersModule} from "../../../users/users.module";
-import {JwtModule} from "@nestjs/jwt";
+import { GuildsService } from "../../guilds.service";
+import { GuildsModule } from "../../guilds.module";
+import { jwtModule } from "../../../config/configuration";
+import { Guild, GuildSchema } from "../../guild.schema";
+import { ChannelsModule } from "../channels.module";
+import { ChannelsService } from "../channels.service";
+import {Channel, ChannelSchema} from "../channel.schema";
 
 @Module({
   imports: [
@@ -24,27 +29,51 @@ import {JwtModule} from "@nestjs/jwt";
         useFactory: () => {
           const schema = MessageSchema;
 
-          // schema.virtual("channel", {
-          //   ref: "Channel",
-          //   localField: "channelID",
-          //   foreignField: "_id",
-          //   justOne: true,
-          // });
-          //
-          // schema.virtual("author", {
-          //   ref: "User",
-          //   localField: "authorID",
-          //   foreignField: "_id",
-          //   justOne: true,
+          return schema;
+        },
+      },
+    ]),
+    MongooseModule.forFeatureAsync([
+      {
+        name: Guild.name,
+        useFactory: () => {
+          const schema = GuildSchema;
+
+          // schema.pre("validate", async function (next) {
+          //   if (this.isNew) this.addDefaultChannels.bind(this)();
+          //   return next();
           // });
 
           return schema;
         },
       },
     ]),
-    JwtModule,
+    MongooseModule.forFeatureAsync([
+      {
+        name: Channel.name,
+        useFactory: () => {
+          const schema = ChannelSchema;
+
+          // Add Position
+          schema.pre("validate", async function (next) {
+            if (this.isNew) this.position = await this.addPosition.bind(this)();
+            return next();
+          });
+
+          return schema;
+        },
+      },
+    ]),
+    jwtModule,
   ],
-  providers: [MessagesGateway, MessagesService, UsersService, JwtStrategy],
+  providers: [
+    MessagesGateway,
+    MessagesService,
+    GuildsService,
+    UsersService,
+    JwtStrategy,
+    ChannelsService,
+  ],
   controllers: [MessagesController],
 })
 export class MessagesModule {}

@@ -9,30 +9,29 @@ import { Server } from "socket.io";
 import { SocketWithUser } from "../types/socket";
 import { UsersService } from "../users/users.service";
 import { UseGuards } from "@nestjs/common";
+import {SocketsService} from "./sockets.service";
 
 @WebSocketGateway()
-export class GuildsGateway
+export class SocketsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
-  constructor() {}
-  @WebSocketServer() io: Server;
+  constructor(private readonly socketsService: SocketsService) {}
+  @WebSocketServer() public io: Server;
 
-  afterInit(): void {
-    console.log("Websocket Gateway Initialized!");
+  afterInit(server: Server): void {
+    this.socketsService.socket = server;
   }
 
   handleConnection(client: SocketWithUser): void {
-    const sockets = this.io.sockets.sockets;
-    console.log({ client });
-
-    // console.log(`WS Client with ID: ${client.user.id} connected!`);
-    // console.log(`Number of connected clients: ${sockets.size}`);
+    // join the guilds the user is in
+    client.join(client.user.guilds);
+    // console.log(`WS Client with ID: ${client.user._id} connected!`);
   }
 
   handleDisconnect(client: SocketWithUser): void {
     const sockets = this.io.sockets.sockets;
 
-    console.log(`WS Client with ID: ${client.user.id} disconnected!`);
-    console.log(`Number of connected clients: ${sockets.size}`);
+    // console.log(`WS Client with ID: ${client.user._id} disconnected!`);
+    // console.log(`Number of connected clients: ${sockets.size}`);
   }
 }

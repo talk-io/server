@@ -13,7 +13,9 @@ import { JwtAuthGuard } from "../guards/auth.guard";
 @UseGuards(JwtAuthGuard)
 @Serialize(GuildDto)
 export class GuildsController {
-  constructor(private readonly guildsService: GuildsService) {}
+  constructor(
+      private readonly guildsService: GuildsService,
+  ) {}
 
   @Post()
   async create(

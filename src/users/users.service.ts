@@ -1,12 +1,12 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
-import {InjectModel} from "@nestjs/mongoose";
-import {User, UserDocument} from "./user.schema";
-import {Model} from "mongoose";
-import {CreateUserDto} from "./dtos/create-user.dto";
-import {LoginUserDto} from "./dtos/login-user.dto";
-import {CurrentUserType} from "../decorators/current-user.decorator";
-import {JwtService} from "@nestjs/jwt";
-import {SnowflakeGenerator} from "../utils/generate-snowflake.util";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { User, UserDocument } from "./user.schema";
+import { Model } from "mongoose";
+import { CreateUserDto } from "./dtos/create-user.dto";
+import { LoginUserDto } from "./dtos/login-user.dto";
+import { CurrentUserType } from "../decorators/current-user.decorator";
+import { JwtService } from "@nestjs/jwt";
+import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
 
 const bcrypt = require("bcrypt");
 
@@ -64,7 +64,12 @@ export class UsersService {
     if (!isPasswordCorrect)
       throw new BadRequestException("The given password is incorrect!");
 
-    const token = await user.generateAuthToken();
+    const token = this.jwtService.sign({
+      _id: user._id,
+      username: user.username,
+    });
+    user.tokens.push(token);
+    await user.save();
     return { ...user.toObject(), token };
   }
 
@@ -89,11 +94,14 @@ export class UsersService {
     return bcrypt.compare(loginData.password, user.password);
   }
 
-  public async verifyUser(token: string) {
+  public async verifyToken(token: string) {
     const payload = await this.jwtService.verify(token);
-    return this.userModel.findOne({
+    console.log({ payload });
+    const res = await this.userModel.findOne({
       _id: payload._id,
-      tokens: {$in: [token]},
+      tokens: { $in: [token] },
     });
+    if (!res) throw new BadRequestException("Invalid token!");
+    return res;
   }
 }

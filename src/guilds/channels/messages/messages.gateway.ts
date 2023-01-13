@@ -9,6 +9,7 @@ import { CreateMessageDto } from "./dto/create-message.dto";
 import { UseGuards } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { Events } from "../../../types/events";
+import {GuildsService} from "../../guilds.service";
 
 const {
   MessageEvents: { MESSAGE_CREATED },
@@ -18,15 +19,14 @@ const {
 export class MessagesGateway {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly messagesService: MessagesService) {}
-
-  handleConnection(client: Socket, room: string) {
-    client.on("connect", () => {});
-  }
+  constructor(
+      private readonly messagesService: MessagesService,
+      private readonly guildsService: GuildsService
+  ) {}
 
   @SubscribeMessage(MESSAGE_CREATED)
   create(@MessageBody() createMessageDto: CreateMessageDto) {
-    // this.server.emit(MESSAGE_CREATED, createMessageDto);
-    // return [1, 2, 3];
+    // const user = this.server.sockets.sockets.get(createMessageDto.author);
+    // return this.server.to();
   }
 }

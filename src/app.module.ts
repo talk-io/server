@@ -6,11 +6,13 @@ import { ChannelsModule } from "./guilds/channels/channels.module";
 import { GuildsModule } from "./guilds/guilds.module";
 import { MessagesModule } from "./guilds/channels/messages/messages.module";
 import { ConfigModule } from "@nestjs/config";
+import { SocketsModule } from './sockets/sockets.module';
 import configuration from "./config/configuration";
 
 @Module({
   imports: [
     MongooseModule.forRoot("mongodb://127.0.0.1:27017/talkio"),
+    SocketsModule,
     UsersModule,
     GuildsModule,
     ChannelsModule,
@@ -36,6 +38,7 @@ import configuration from "./config/configuration";
       isGlobal: true,
       load: [configuration],
     }),
+    SocketsModule,
   ],
   providers: [
     {

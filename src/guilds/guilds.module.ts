@@ -4,10 +4,10 @@ import { GuildsService } from "./guilds.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "../users/user.schema";
 import { Guild, GuildSchema } from "./guild.schema";
-import { GuildsGateway } from "./guilds.gateway";
+import { SocketsGateway } from "../sockets/sockets.gateway";
 import { UsersService } from "../users/users.service";
 import { jwtModule } from "../config/configuration";
-import {JwtStrategy} from "../users/strategies/jwt.strategy";
+import { JwtStrategy } from "../users/strategies/jwt.strategy";
 
 @Module({
   imports: [
@@ -35,6 +35,7 @@ import {JwtStrategy} from "../users/strategies/jwt.strategy";
     jwtModule,
   ],
   controllers: [GuildsController],
-  providers: [GuildsService, UsersService, GuildsGateway, JwtStrategy],
+  providers: [GuildsService, UsersService, SocketsGateway, JwtStrategy],
+  exports: [GuildsService],
 })
 export class GuildsModule {}
