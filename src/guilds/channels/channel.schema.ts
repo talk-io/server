@@ -9,6 +9,9 @@ export type ChannelDocument = HydratedDocument<Channel>;
 @Schema({
   timestamps: true,
   _id: false,
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+  virtuals: true,
 })
 export class Channel {
   @Prop({

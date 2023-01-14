@@ -9,6 +9,7 @@ export type GuildDocument = HydratedDocument<Guild>;
 
 @Schema({
   timestamps: true,
+  toObject: { virtuals: true },
   _id: false,
 })
 export class Guild {
@@ -38,6 +39,12 @@ export class Guild {
 
 export const GuildSchema = SchemaFactory.createForClass(Guild);
 
+GuildSchema.virtual("channels", {
+  ref: "Channel",
+  localField: "_id",
+  foreignField: "guildID",
+});
+
 GuildSchema.virtual("members", {
   ref: "User",
   localField: "_id",
@@ -52,20 +59,32 @@ GuildSchema.virtual("owner", {
   justOne: true,
 });
 
-GuildSchema.virtual("channels", {
-  ref: "Channel",
-  localField: "_id",
-  foreignField: "guildID",
-});
-
-// GuildSchema.virtual("membersCount", {
-//   ref: "User",
-//   local
-// })
-
 GuildSchema.methods.addDefaultChannels = async function (): Promise<void> {
   const guild = this;
   if (!guild.isNew) return;
+
+  const defaultChannels = [
+    {
+      name: "Text Channels",
+      type: ChannelType.GUILD_CATEGORY,
+      children: [
+        {
+          name: "channel-1",
+          type: ChannelType.GUILD_TEXT,
+        },
+      ],
+    },
+    {
+      name: "Voice Channels",
+      type: ChannelType.GUILD_CATEGORY,
+      children: [
+        {
+          name: "voice-1",
+          type: ChannelType.GUILD_VOICE,
+        },
+      ],
+    },
+  ];
 
   const ChannelObjects = this.$model("Channel") as Model<ChannelDocument>;
 
@@ -97,27 +116,5 @@ GuildSchema.methods.addDefaultChannels = async function (): Promise<void> {
     return [savedCategory, ...(await Promise.all(categoryChildren))];
   });
   await Promise.all(channels);
+  return;
 };
-
-const defaultChannels = [
-  {
-    name: "Text Channels",
-    type: ChannelType.GUILD_CATEGORY,
-    children: [
-      {
-        name: "channel-1",
-        type: ChannelType.GUILD_TEXT,
-      },
-    ],
-  },
-  {
-    name: "Voice Channels",
-    type: ChannelType.GUILD_CATEGORY,
-    children: [
-      {
-        name: "voice-1",
-        type: ChannelType.GUILD_VOICE,
-      },
-    ],
-  },
-];

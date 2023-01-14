@@ -13,7 +13,6 @@ import { UserDocument } from "../users/user.schema";
 
 @Injectable()
 export class GuildsService {
-
   constructor(
     @InjectModel("Guild") private readonly guildModel: Model<GuildDocument>,
     @InjectModel("User") private readonly userModel: Model<UserDocument>
@@ -57,8 +56,15 @@ export class GuildsService {
 
   async leave(guildID: string, currentUser: CurrentUserType) {
     const user = await this.userModel.findById(currentUser._id);
+
     if (!user) throw new NotFoundException("Requested User was not found!");
-    user.guilds = user.guilds.filter((guild) => guild.toString() !== guildID);
+    const guildIndex = user.guilds.findIndex(
+      (guild) => guild.toString() === guildID
+    );
+    if (guildIndex === -1)
+      throw new BadRequestException("You are not a member of this guild!");
+
+    user.guilds.splice(guildIndex, 1);
     await user.save();
     return;
   }

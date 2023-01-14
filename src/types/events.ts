@@ -1,7 +1,7 @@
 export namespace Events {
     export enum GuildUserEvents {
-        JOIN = "guildUserJoin",
-        LEAVE = "guildUserLeave",
+        JOIN_GUILD = "guildUserJoin",
+        LEAVE_GUILD = "guildUserLeave",
         KICK = "guildUserKick",
         BAN = "guildUserBan",
         UNBAN = "guildUserUnban",

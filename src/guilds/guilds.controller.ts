@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import {BadRequestException, Body, Controller, Get, Param, Post, UseGuards} from "@nestjs/common";
 import { CreateGuildDto } from "./dto/create-guild.dto";
 import { GuildsService } from "./guilds.service";
 import {
@@ -8,15 +8,7 @@ import {
 import { Serialize } from "../interceptors/serialize.interceptor";
 import { GuildDto } from "./dto/guild.dto";
 import { JwtAuthGuard } from "../guards/auth.guard";
-import { SocketsService } from "../sockets/sockets.service";
-import { ConnectedSocket } from "@nestjs/websockets";
-import { Socket } from "socket.io";
-import { Events } from "../types/events";
-import { Client } from "socket.io/dist/client";
 import { SocketsGateway } from "../sockets/sockets.gateway";
-import { SocketWithUser } from "../types/socket";
-
-const { JOIN } = Events.GuildUserEvents;
 
 @Controller()
 @UseGuards(JwtAuthGuard)
@@ -41,7 +33,8 @@ export class GuildsController {
     @CurrentUser() user: CurrentUserType
   ) {
     const guild = await this.guildsService.join(guildID, user);
-    this.socketsGateway.addUserToGuildRoom(guild._id, user._id);
+
+    await this.socketsGateway.addUserToGuildRoom(guild._id, user);
     return guild;
   }
 
@@ -54,10 +47,10 @@ export class GuildsController {
   async leave(
     @Param("guildID") guildID: string,
     @CurrentUser() user: CurrentUserType,
-    @ConnectedSocket() client: SocketWithUser
   ) {
+    if(!guildID) throw new BadRequestException("Guild ID is required");
     await this.guildsService.leave(guildID, user);
-    this.socketsGateway.removeUserFromGuildRoom(guildID, user._id);
-    this.socketsGateway.io.sockets.to(guildID).emit(JOIN, user);
+
+    this.socketsGateway.removeUserFromGuildRoom(guildID, user);
   }
 }

@@ -1,4 +1,5 @@
-import { Expose } from "class-transformer";
+import {Expose, Type} from "class-transformer";
+import {ChannelDto} from "../channels/dto/channel.dto";
 
 export class BasicGuildDto {
   @Expose()
@@ -9,4 +10,8 @@ export class BasicGuildDto {
 
   @Expose()
   description: string;
+
+  @Expose()
+  @Type(() => ChannelDto)
+  channels: Array<string>;
 }

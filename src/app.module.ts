@@ -7,7 +7,7 @@ import { GuildsModule } from "./guilds/guilds.module";
 import { MessagesModule } from "./guilds/channels/messages/messages.module";
 import { ConfigModule } from "@nestjs/config";
 import { SocketsModule } from "./sockets/sockets.module";
-import configuration from "./config/configuration";
+import configuration, { jwtModule } from "./config/configuration";
 import { Guild, GuildSchema } from "./guilds/guild.schema";
 import { Channel, ChannelSchema } from "./guilds/channels/channel.schema";
 import {
@@ -81,6 +81,7 @@ import { User, UserSchema } from "./users/user.schema";
         },
       },
     ]),
+    jwtModule,
   ],
   providers: [
     {

@@ -10,6 +10,9 @@ export type UserDocument = HydratedDocument<User>;
 @Schema({
   timestamps: true,
   _id: false,
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+  virtuals: true,
 })
 export class User {
   @Prop({
@@ -43,17 +46,6 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-// UserSchema.methods.generateAuthToken = async function () {
-//   const user = this;
-//   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
-//     expiresIn: "30d",
-//   });
-//   user.tokens.push(token);
-//
-//   await user.save();
-//   return token;
-// };
 
 UserSchema.pre("save", async function (next) {
   const user = this;

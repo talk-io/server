@@ -96,7 +96,7 @@ export class UsersService {
 
   public async verifyToken(token: string) {
     const payload = await this.jwtService.verify(token);
-    console.log({ payload });
+
     const res = await this.userModel.findOne({
       _id: payload._id,
       tokens: { $in: [token] },

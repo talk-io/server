@@ -7,9 +7,7 @@ import { SnowflakeGenerator } from "../../../utils/generate-snowflake.util";
 @Schema({
   timestamps: true,
   _id: false,
-  toJSON: {
-    virtuals: true,
-  }
+  toObject: { virtuals: true },
 })
 export class Message {
   @Prop({

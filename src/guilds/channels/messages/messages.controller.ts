@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -42,6 +43,8 @@ export class MessagesController {
     @Param("channelID") channelID: string,
     @CurrentUser("_id") user: string
   ) {
+    if(!channelID) throw new BadRequestException("Channel ID is required");
+
     const message = await this.messagesService.create(
       createMessageDto,
       channelID,
@@ -52,9 +55,11 @@ export class MessagesController {
       "author",
       "channel",
     ]);
+
     this.socketsService.socket
       .to(populatedMessage.channel.guildID)
       .emit(MESSAGE_CREATED, populatedMessage);
+
     return populatedMessage;
   }
 
