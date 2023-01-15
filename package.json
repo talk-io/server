@@ -1,10 +1,10 @@
 {
-  "name": "talk-io",
+  "name": "talk-io_server",
   "version": "0.0.1",
   "description": "Open source real-time chat application.",
   "author": "Aniket Kotal",
   "private": false,
-  "license": "WTFPL",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
