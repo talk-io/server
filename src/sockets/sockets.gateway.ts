@@ -2,6 +2,7 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
@@ -15,16 +16,18 @@ import { plainToInstance } from "class-transformer";
 import { GuildUserDto } from "../users/dtos/guild-user.dto";
 
 const { JOIN_GUILD, LEAVE_GUILD } = Events.GuildUserEvents;
+const { INIT } = Events.UserEvents;
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: { origin: "*" } })
 export class SocketsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
+  @WebSocketServer() public io: Server;
+
   constructor(
     private readonly socketsService: SocketsService,
     private readonly usersService: UsersService
   ) {}
-  @WebSocketServer() public io: Server;
 
   afterInit(server: Server): void {
     this.socketsService.socket = server;
@@ -33,23 +36,19 @@ export class SocketsGateway
   async handleConnection(client: SocketWithUser): Promise<void> {
     const clientID = client.id;
     const userID = client.user.id;
-    this.socketsService.addUserSocket(userID, clientID);
 
+    this.socketsService.addUserSocket(userID, clientID);
     client.join(client.user.guilds);
 
-    const userInitialData = await this.socketsService.getUserInitialData(
-      userID
-    );
+    console.log("Client connected: ", clientID);
 
-    client.emit("init", userInitialData);
+    const userData = await this.socketsService.getUserInitialData(userID);
+    this.io.sockets.to(clientID).emit(INIT, userData);
   }
 
   handleDisconnect(client: SocketWithUser): void {
     const userID = client.user.id;
     this.socketsService.removeUserSocket(userID);
-    // client.user.guilds.forEach((guildID) => {
-    //   client.leave(guildID);
-    // });
   }
 
   async addUserToGuildRoom(guildID: string, user: CurrentUserType) {

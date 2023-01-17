@@ -14,18 +14,20 @@ import { CurrentUser } from "../../../decorators/current-user.decorator";
 import { Serialize } from "../../../interceptors/serialize.interceptor";
 import { MessageDto } from "./dto/message.dto";
 import { JwtAuthGuard } from "../../../guards/auth.guard";
-import { ConnectedSocket, WebSocketServer } from "@nestjs/websockets";
+import { WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { Events } from "../../../types/events";
 import { SocketsService } from "../../../sockets/sockets.service";
 import { ChannelsService } from "../channels.service";
 import { Channel } from "../channel.schema";
+import { Timeout } from "../../../interceptors/timeout.interceptor";
 
 const {
   MessageEvents: { MESSAGE_CREATED },
 } = Events;
 
 @Controller()
+// @Timeout(5)
 @Serialize(MessageDto)
 @UseGuards(JwtAuthGuard)
 export class MessagesController {
@@ -33,8 +35,7 @@ export class MessagesController {
 
   constructor(
     private readonly messagesService: MessagesService,
-    private readonly socketsService: SocketsService,
-    private readonly channelsService: ChannelsService
+    private readonly socketsService: SocketsService
   ) {}
 
   @Post()
@@ -43,7 +44,7 @@ export class MessagesController {
     @Param("channelID") channelID: string,
     @CurrentUser("_id") user: string
   ) {
-    if(!channelID) throw new BadRequestException("Channel ID is required");
+    if (!channelID) throw new BadRequestException("Channel ID is required");
 
     const message = await this.messagesService.create(
       createMessageDto,
@@ -58,7 +59,7 @@ export class MessagesController {
 
     this.socketsService.socket
       .to(populatedMessage.channel.guildID)
-      .emit(MESSAGE_CREATED, populatedMessage);
+      .emit(MESSAGE_CREATED, populatedMessage.toObject());
 
     return populatedMessage;
   }
