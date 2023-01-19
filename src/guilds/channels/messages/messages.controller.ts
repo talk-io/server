@@ -15,10 +15,9 @@ import { Serialize } from "../../../interceptors/serialize.interceptor";
 import { MessageDto } from "./dto/message.dto";
 import { JwtAuthGuard } from "../../../guards/auth.guard";
 import { WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { Events } from "../../../types/events";
 import { SocketsService } from "../../../sockets/sockets.service";
-import { ChannelsService } from "../channels.service";
 import { Channel } from "../channel.schema";
 import { Timeout } from "../../../interceptors/timeout.interceptor";
 
@@ -27,7 +26,7 @@ const {
 } = Events;
 
 @Controller()
-// @Timeout(5)
+@Timeout(5)
 @Serialize(MessageDto)
 @UseGuards(JwtAuthGuard)
 export class MessagesController {
