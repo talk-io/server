@@ -8,6 +8,8 @@ import { SnowflakeGenerator } from "../../../utils/generate-snowflake.util";
   timestamps: true,
   _id: false,
   toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+  virtuals: true,
 })
 export class Message {
   @Prop({

@@ -57,7 +57,7 @@ export class MessagesController {
     ]);
 
     this.socketsService.socket
-      .to(populatedMessage.channel.guildID)
+      .to(channelID)
       .emit(MESSAGE_CREATED, populatedMessage.toObject());
 
     return populatedMessage;

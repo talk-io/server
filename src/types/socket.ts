@@ -3,4 +3,5 @@ import { UserDocument } from "../users/user.schema";
 
 export type SocketWithUser = Socket & {
   user: UserDocument;
+  channels: string[];
 };

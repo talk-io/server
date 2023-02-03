@@ -38,7 +38,7 @@ export class SocketsGateway
     const userID = client.user.id;
 
     this.socketsService.addUserSocket(userID, clientID);
-    client.join(client.user.guilds);
+    client.join(client.channels);
 
     console.log("Client connected: ", clientID);
 

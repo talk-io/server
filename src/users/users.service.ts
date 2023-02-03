@@ -7,6 +7,9 @@ import { LoginUserDto } from "./dtos/login-user.dto";
 import { CurrentUserType } from "../decorators/current-user.decorator";
 import { JwtService } from "@nestjs/jwt";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
+import { Channel, ChannelDocument } from "../guilds/channels/channel.schema";
+import { ChannelType } from "../types/channel.type";
+import { Guild, GuildDocument } from "../guilds/guild.schema";
 
 const bcrypt = require("bcrypt");
 
@@ -18,22 +21,6 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly jwtService: JwtService
   ) {}
-
-  private async _generateDiscriminator(username) {
-    const generate = () => Math.floor(Math.random() * 9999);
-    const userExists = async (discriminator: number) =>
-      this.userModel.find({ username, discriminator });
-
-    let discriminator = generate();
-    let usersWithDiscriminator = await userExists(discriminator);
-
-    while (usersWithDiscriminator.length > 0) {
-      discriminator = generate();
-      usersWithDiscriminator = await userExists(discriminator);
-    }
-
-    return discriminator;
-  }
 
   async create(user: CreateUserDto): Promise<LoggedInUser> {
     const users = await this.userModel.find({ email: user.email });
@@ -101,7 +88,46 @@ export class UsersService {
       _id: payload._id,
       tokens: { $in: [token] },
     });
+
     if (!res) throw new BadRequestException("Invalid token!");
-    return res;
+
+    const populateRes = await res.populate({
+      path: "guilds",
+      populate: {
+        path: "channels",
+      },
+    });
+
+    const user = populateRes.toObject();
+    const { guilds } = user;
+
+    const channels = guilds.reduce((acc, guild) => {
+      // @ts-ignore
+      const textChannels = guild.channels.filter(
+        (channel) => channel.type === ChannelType.GUILD_TEXT
+      );
+      // @ts-ignore
+      return [...acc, ...textChannels.map((channel) => channel._id)];
+    }, []);
+
+    console.log({ channels });
+
+    return { user, channels };
+  }
+
+  private async _generateDiscriminator(username) {
+    const generate = () => Math.floor(Math.random() * 9999);
+    const userExists = async (discriminator: number) =>
+      this.userModel.find({ username, discriminator });
+
+    let discriminator = generate();
+    let usersWithDiscriminator = await userExists(discriminator);
+
+    while (usersWithDiscriminator.length > 0) {
+      discriminator = generate();
+      usersWithDiscriminator = await userExists(discriminator);
+    }
+
+    return discriminator;
   }
 }

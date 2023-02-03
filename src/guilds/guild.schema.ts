@@ -10,6 +10,8 @@ export type GuildDocument = HydratedDocument<Guild>;
 @Schema({
   timestamps: true,
   toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+  virtuals: true,
   _id: false,
 })
 export class Guild {
