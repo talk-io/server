@@ -1,5 +1,6 @@
-import {Expose, Type} from "class-transformer";
-import {ChannelDto} from "../channels/dto/channel.dto";
+import { Expose, Type } from "class-transformer";
+import { ChannelDto } from "../channels/dto/channel.dto";
+import { GuildUserDto } from "../../users/dtos/guild-user.dto";
 
 export class BasicGuildDto {
   @Expose()
@@ -14,4 +15,12 @@ export class BasicGuildDto {
   @Expose()
   @Type(() => ChannelDto)
   channels: Array<string>;
+
+  @Expose()
+  @Type(() => GuildUserDto)
+  members: Array<string>;
+
+  @Expose()
+  @Type(() => GuildUserDto)
+  owner: string;
 }

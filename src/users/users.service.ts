@@ -103,14 +103,12 @@ export class UsersService {
 
     const channels = guilds.reduce((acc, guild) => {
       // @ts-ignore
-      const textChannels = guild.channels.filter(
-        (channel) => channel.type === ChannelType.GUILD_TEXT
-      );
+      // const textChannels = guild.channels.filter(
+      //   (channel) => channel.type === ChannelType.GUILD_TEXT
+      // );
       // @ts-ignore
-      return [...acc, ...textChannels.map((channel) => channel._id)];
+      return [...acc, ...guild.channels.map((channel) => channel._id)];
     }, []);
-
-    console.log({ channels });
 
     return { user, channels };
   }

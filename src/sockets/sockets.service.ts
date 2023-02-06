@@ -35,10 +35,9 @@ export class SocketsService {
       guilds: Array<GuildDocument & { channels: Array<ChannelDocument> }>;
     }>({
       path: "guilds",
-      populate: {
-        path: "channels",
-      },
+      populate: ["owner", "members", "channels"],
     });
+
     return plainToInstance(UserDto, userWithGuilds.toObject(), {
       excludeExtraneousValues: true,
     });
