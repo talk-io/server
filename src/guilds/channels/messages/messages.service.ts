@@ -33,7 +33,7 @@ export class MessagesService {
     return this.messageModel
       .find({ channelID, createdAt: { $lte: time } })
       .limit(limit)
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .populate(["author"]);
   }
 }

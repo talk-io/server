@@ -26,7 +26,7 @@ const {
 } = Events;
 
 @Controller()
-@Timeout(5)
+// @Timeout(5)
 @Serialize(MessageDto)
 @UseGuards(JwtAuthGuard)
 export class MessagesController {

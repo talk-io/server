@@ -19,6 +19,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") implements CanActivate {
       request.user = this.jwtService.verify(token);
       return true;
     } catch (e) {
+      console.log({ e });
       return false;
     }
   }
