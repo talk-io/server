@@ -9,20 +9,23 @@ import { UsersService } from "../users/users.service";
 @Injectable()
 export class SocketsService {
   public socket: Server = null;
-  userSockets: Map<string, string> = new Map();
+  userSockets: Map<string, Array<string>> = new Map();
   constructor(private readonly usersService: UsersService) {}
 
   public addUserSocket(userID: string, clientID: string) {
-    this.userSockets.set(userID, clientID);
+    if (!this.userSockets.has(userID)) this.userSockets.set(userID, []);
+    this.userSockets.get(userID).push(clientID);
   }
 
-  public removeUserSocket(userID: string) {
-    this.userSockets.delete(userID);
-    // guildIDs.forEach((guildID) => {
-    //   if (this.userSockets.has(guildID)) {
-    //     this.userSockets.get(guildID).delete(userID);
-    //   }
-    // });
+  public removeUserSocket(userID: string, clientID: string) {
+    const userSockets = this.userSockets.get(userID);
+    if (!userSockets) return;
+
+    const index = userSockets.indexOf(clientID);
+    if (index === -1) return;
+
+    userSockets.splice(index, 1);
+    if (!userSockets.length) this.userSockets.delete(userID);
   }
 
   public getUserSockets(userID: string) {

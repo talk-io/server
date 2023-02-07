@@ -33,7 +33,7 @@ const verifyUserMiddleware =
     const { authorization } = socket.handshake.headers;
     try {
       const [_, token] = authorization.split(" ");
-      if (!token) next(new Error("Unauthorized"));
+      if (!token) next(new WsException("Unauthorized"));
 
       const data = await usersService.verifyToken(token);
       if (!data) next(new WsException("Unauthorized"));

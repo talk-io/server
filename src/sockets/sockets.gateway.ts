@@ -48,12 +48,15 @@ export class SocketsGateway
 
   handleDisconnect(client: SocketWithUser): void {
     const userID = client.user.id;
-    this.socketsService.removeUserSocket(userID);
+    const clientID = client.id;
+    this.socketsService.removeUserSocket(userID, clientID);
+
+    console.log("Client disconnected: ", clientID);
   }
 
   async addUserToGuildRoom(guildID: string, user: CurrentUserType) {
-    const clientID = this.socketsService.getUserSockets(user._id);
-    if (!clientID) return false;
+    const clientIDs = this.socketsService.getUserSockets(user._id);
+    if (!clientIDs.length) return false;
 
     const detailedUser = await this.usersService.findOne(user._id);
 
@@ -65,13 +68,16 @@ export class SocketsGateway
       }
     );
 
-    this.io.sockets.sockets.get(clientID).join(guildID);
+    clientIDs.forEach((clientID) => {
+      this.io.sockets.sockets.get(clientID).join(guildID);
+    });
+
     this.io.sockets.to(guildID).emit(JOIN_GUILD, serializedUser);
   }
 
   async removeUserFromGuildRoom(guildID: string, user: CurrentUserType) {
-    const clientID = this.socketsService.getUserSockets(user._id);
-    if (!clientID) return false;
+    const clientIDs = this.socketsService.getUserSockets(user._id);
+    if (!clientIDs.length) return false;
 
     const detailedUser = await this.usersService.findOne(user._id);
 
@@ -83,7 +89,9 @@ export class SocketsGateway
       }
     );
 
-    this.io.sockets.sockets.get(clientID).leave(guildID);
+    clientIDs.forEach((clientID) => {
+      this.io.sockets.sockets.get(clientID).leave(guildID);
+    });
     this.io.sockets.to(guildID).emit(LEAVE_GUILD, serializedUser);
   }
 }
