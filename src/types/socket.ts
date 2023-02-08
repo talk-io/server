@@ -1,7 +1,8 @@
 import { Socket } from "socket.io";
-import { UserDocument } from "../users/user.schema";
+import { User, UserDocument } from "../users/user.schema";
+import { LeanDocument } from "mongoose";
 
 export type SocketWithUser = Socket & {
-  user: UserDocument;
+  user: LeanDocument<User>;
   channels: string[];
 };

@@ -114,7 +114,7 @@ export class UsersService {
   }
 
   private async _generateDiscriminator(username) {
-    const generate = () => Math.floor(Math.random() * 9999);
+    const generate = () => Math.floor(Math.random() * (9999 - 1000) + 1000);
     const userExists = async (discriminator: number) =>
       this.userModel.find({ username, discriminator });
 

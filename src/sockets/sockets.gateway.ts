@@ -1,4 +1,6 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -10,13 +12,14 @@ import { Server } from "socket.io";
 import { SocketWithUser } from "../types/socket";
 import { SocketsService } from "./sockets.service";
 import { CurrentUserType } from "../decorators/current-user.decorator";
-import { Events } from "../types/events";
+import { Events, UserTyping } from "../types/events";
 import { UsersService } from "../users/users.service";
 import { plainToInstance } from "class-transformer";
 import { GuildUserDto } from "../users/dtos/guild-user.dto";
 
 const { JOIN_GUILD, LEAVE_GUILD } = Events.GuildUserEvents;
 const { INIT } = Events.UserEvents;
+const { USER_TYPING_START, USER_TYPING_END } = Events.ChannelEvents;
 
 @WebSocketGateway({ cors: { origin: "*" } })
 export class SocketsGateway
@@ -35,7 +38,7 @@ export class SocketsGateway
 
   async handleConnection(client: SocketWithUser): Promise<void> {
     const clientID = client.id;
-    const userID = client.user.id;
+    const userID = client.user._id;
 
     this.socketsService.addUserSocket(userID, clientID);
     client.join(client.channels);
@@ -47,7 +50,7 @@ export class SocketsGateway
   }
 
   handleDisconnect(client: SocketWithUser): void {
-    const userID = client.user.id;
+    const userID = client.user._id;
     const clientID = client.id;
     this.socketsService.removeUserSocket(userID, clientID);
 
@@ -93,5 +96,34 @@ export class SocketsGateway
       this.io.sockets.sockets.get(clientID).leave(guildID);
     });
     this.io.sockets.to(guildID).emit(LEAVE_GUILD, serializedUser);
+  }
+
+  @SubscribeMessage(USER_TYPING_START)
+  async handleUserTypingStart(
+    @MessageBody() channelID: string,
+    @ConnectedSocket() client: SocketWithUser
+  ) {
+    const serializedUser = plainToInstance(GuildUserDto, client.user, {
+      excludeExtraneousValues: true,
+    });
+
+    const payload = {
+      channelID,
+      user: serializedUser,
+    };
+
+    client.broadcast.to(channelID).emit(USER_TYPING_START, payload);
+  }
+
+  @SubscribeMessage(USER_TYPING_END)
+  async handleUserTypingEnd(
+    @MessageBody() channelID: string,
+    @ConnectedSocket() client: SocketWithUser
+  ) {
+    const payload = {
+      channelID,
+      userID: client.user._id,
+    };
+    client.broadcast.to(channelID).emit(USER_TYPING_END, payload);
   }
 }
