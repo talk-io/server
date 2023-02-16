@@ -22,4 +22,10 @@ export class MessageDto {
     @Expose()
     @Type(() => GuildUserDto)
     author: GuildUserDto;
+
+    @Expose()
+    createdAt: Date;
+
+    @Expose()
+    updatedAt: Date;
 }

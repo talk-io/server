@@ -42,14 +42,19 @@ export class UsersService {
 
   async login(loginData: LoginUserDto): Promise<LoggedInUser> {
     const user = await this.userModel.findOne({ email: loginData.email });
-    if (!user) throw new BadRequestException("The email is not registered!");
+    if (!user)
+      throw new BadRequestException({
+        email: "The email is not registered!",
+      });
 
     const isPasswordCorrect = await bcrypt.compare(
       loginData.password,
       user.password
     );
     if (!isPasswordCorrect)
-      throw new BadRequestException("The given password is incorrect!");
+      throw new BadRequestException({
+        password: "The given password is incorrect!",
+      });
 
     const token = this.jwtService.sign({
       _id: user._id,
