@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
 import { HydratedDocument } from "mongoose";
 import * as dayjs from "dayjs";
+import { GuildDocument } from "../guilds/guild.schema";
 
 @Schema({
   timestamps: true,
@@ -63,11 +64,7 @@ InviteSchema.virtual("channel", {
   localField: "channelID",
   foreignField: "_id",
   justOne: true,
-});
-
-InviteSchema.virtual("guild", {
-  ref: "Guild",
-  localField: "channelID",
-  foreignField: "channels._id",
-  justOne: true,
+  options: {
+    populate: "guild",
+  },
 });

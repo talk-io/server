@@ -90,11 +90,8 @@ export class ChannelsService {
     });
 
     const invite = await inv.save();
+    const populatedInvite = await invite.populate(["channel", "inviter"]);
 
-    const data = await invite.populate(["channel", "inviter", "guild"]);
-
-    console.log({ data });
-
-    return data;
+    return populatedInvite.toObject();
   }
 }

@@ -1,5 +1,6 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
 import { ChannelType } from "../../types/channel.type";
+import { BasicGuildDto } from "../../guilds/dto/basic-guild.dto";
 
 export class ChannelDto {
   @Expose()
@@ -22,4 +23,8 @@ export class ChannelDto {
 
   @Expose()
   nsfw: boolean;
+
+  @Expose()
+  @Type(() => BasicGuildDto)
+  guild: BasicGuildDto;
 }
