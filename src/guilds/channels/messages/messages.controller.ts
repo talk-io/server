@@ -19,8 +19,7 @@ import { Server } from "socket.io";
 import { Events } from "../../../types/events";
 import { SocketsService } from "../../../sockets/sockets.service";
 import { Channel } from "../channel.schema";
-import { Timeout } from "../../../interceptors/timeout.interceptor";
-import {plainToInstance} from "class-transformer";
+import { plainToInstance } from "class-transformer";
 
 const {
   MessageEvents: { MESSAGE_CREATED },
@@ -57,15 +56,13 @@ export class MessagesController {
       "channel",
     ]);
 
-    const serializedMessage = plainToInstance(MessageDto, populatedMessage.toObject(), {
+    // this.socketsService.socket
+    //   .to(channelID)
+    //   .emit(MESSAGE_CREATED, serializedMessage);
+
+    return plainToInstance(MessageDto, populatedMessage.toObject(), {
       excludeExtraneousValues: true,
     });
-
-    this.socketsService.socket
-      .to(channelID)
-      .emit(MESSAGE_CREATED, serializedMessage);
-
-    return serializedMessage;
   }
 
   @Get()

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { Guild } from "../guilds/guild.schema";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
+import { PresenceStatus } from "../types/enums";
 
 const bcrypt = require("bcrypt");
 
@@ -41,6 +42,11 @@ export class User {
 
   @Prop()
   sessions: Array<string>;
+
+  @Prop({
+    default: () => PresenceStatus.Online,
+  })
+  status: PresenceStatus;
 
   generateAuthToken: () => Promise<string>;
 }

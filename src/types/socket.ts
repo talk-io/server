@@ -5,4 +5,5 @@ import { LeanDocument } from "mongoose";
 export type SocketWithUser = Socket & {
   user: LeanDocument<User>;
   channels: string[];
+  guilds: string[];
 };

@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Server } from "socket.io";
-import { GuildDocument } from "../guilds/guild.schema";
-import { ChannelDocument } from "../guilds/channels/channel.schema";
+import type { GuildDocument } from "../guilds/guild.schema";
+import type { ChannelDocument } from "../guilds/channels/channel.schema";
 import { plainToInstance } from "class-transformer";
 import { UserDto } from "../users/dtos/user.dto";
 import { UsersService } from "../users/users.service";
+import type { UserDocument } from "../users/user.schema";
+import { PresenceStatus } from "../types/enums";
 
 @Injectable()
 export class SocketsService {
@@ -35,10 +37,26 @@ export class SocketsService {
   public async getUserInitialData(userID: string) {
     const user = await this.usersService.findOne(userID);
     const userWithGuilds = await user.populate<{
-      guilds: Array<GuildDocument & { channels: Array<ChannelDocument> }>;
+      guilds: Array<
+        GuildDocument & {
+          channels: Array<ChannelDocument>;
+          members: Array<UserDocument>;
+        }
+      >;
     }>({
       path: "guilds",
-      populate: ["owner", "members", "channels"],
+      populate: [
+        "owner",
+        {
+          path: "members",
+          transform: (doc: UserDocument) => {
+            const isOnline = this.getUserSockets(doc._id);
+            doc.status = isOnline ? doc.status : PresenceStatus.Offline;
+            return doc;
+          },
+        },
+        "channels",
+      ],
     });
 
     return plainToInstance(UserDto, userWithGuilds.toObject(), {

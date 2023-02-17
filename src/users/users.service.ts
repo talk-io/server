@@ -115,7 +115,9 @@ export class UsersService {
       return [...acc, ...guild.channels.map((channel) => channel._id)];
     }, []);
 
-    return { user, channels };
+    const guildsIDs = res.guilds;
+
+    return { user, channels, guilds: guildsIDs };
   }
 
   private async _generateDiscriminator(username) {
