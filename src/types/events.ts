@@ -1,4 +1,4 @@
-import { MessageDto } from "../guilds/channels/messages/dto/message.dto";
+import { MessageDto } from "../channels/messages/dto/message.dto";
 
 export namespace Events {
   export enum UserEvents {

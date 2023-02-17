@@ -2,7 +2,7 @@ import { UserDto } from "../../users/dtos/user.dto";
 import { Expose, Type } from "class-transformer";
 import { User } from "../../users/user.schema";
 import { GuildUserDto } from "../../users/dtos/guild-user.dto";
-import { ChannelDto } from "../channels/dto/channel.dto";
+import { ChannelDto } from "../../channels/dto/channel.dto";
 
 export class GuildDto {
   @Expose()

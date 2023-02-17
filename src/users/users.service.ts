@@ -7,7 +7,7 @@ import { LoginUserDto } from "./dtos/login-user.dto";
 import { CurrentUserType } from "../decorators/current-user.decorator";
 import { JwtService } from "@nestjs/jwt";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
-import { Channel, ChannelDocument } from "../guilds/channels/channel.schema";
+import { Channel, ChannelDocument } from "../channels/channel.schema";
 import { ChannelType } from "../types/channel.type";
 import { Guild, GuildDocument } from "../guilds/guild.schema";
 

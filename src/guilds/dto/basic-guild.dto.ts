@@ -1,5 +1,5 @@
 import { Expose, Type } from "class-transformer";
-import { ChannelDto } from "../channels/dto/channel.dto";
+import { ChannelDto } from "../../channels/dto/channel.dto";
 import { GuildUserDto } from "../../users/dtos/guild-user.dto";
 
 export class BasicGuildDto {

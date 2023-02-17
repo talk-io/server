@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { User, UserDocument } from "../users/user.schema";
-import { Channel, ChannelDocument } from "./channels/channel.schema";
+import { Channel, ChannelDocument } from "../channels/channel.schema";
 import { HydratedDocument, Model } from "mongoose";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
 import { ChannelType } from "../types/channel.type";

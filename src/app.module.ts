@@ -2,19 +2,17 @@ import { Global, Module, ValidationPipe } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { APP_PIPE, RouterModule } from "@nestjs/core";
-import { ChannelsModule } from "./guilds/channels/channels.module";
+import { ChannelsModule } from "./channels/channels.module";
 import { GuildsModule } from "./guilds/guilds.module";
-import { MessagesModule } from "./guilds/channels/messages/messages.module";
+import { MessagesModule } from "./channels/messages/messages.module";
 import { ConfigModule } from "@nestjs/config";
 import { SocketsModule } from "./sockets/sockets.module";
 import configuration, { jwtModule } from "./config/configuration";
 import { Guild, GuildSchema } from "./guilds/guild.schema";
-import { Channel, ChannelSchema } from "./guilds/channels/channel.schema";
-import {
-  Message,
-  MessageSchema,
-} from "./guilds/channels/messages/message.schema";
+import { Channel, ChannelSchema } from "./channels/channel.schema";
+import { Message, MessageSchema } from "./channels/messages/message.schema";
 import { User, UserSchema } from "./users/user.schema";
+import { Invite, InviteSchema } from "./channels/invite.schema";
 
 @Global()
 @Module({
@@ -29,12 +27,10 @@ import { User, UserSchema } from "./users/user.schema";
       {
         path: "/guilds",
         module: GuildsModule,
-        children: [
-          {
-            path: ":guildID/channels",
-            module: ChannelsModule,
-          },
-        ],
+      },
+      {
+        path: "/channels/:channelID",
+        module: ChannelsModule,
       },
       {
         path: "/channels/:channelID/messages",
@@ -60,6 +56,12 @@ import { User, UserSchema } from "./users/user.schema";
           });
 
           return schema;
+        },
+      },
+      {
+        name: Invite.name,
+        useFactory: () => {
+          return InviteSchema;
         },
       },
       {

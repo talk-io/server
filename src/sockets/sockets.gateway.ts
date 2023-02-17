@@ -16,7 +16,7 @@ import { Events } from "../types/events";
 import { UsersService } from "../users/users.service";
 import { plainToInstance } from "class-transformer";
 import { GuildUserDto } from "../users/dtos/guild-user.dto";
-import { Message } from "../guilds/channels/messages/message.schema";
+import { Message } from "../channels/messages/message.schema";
 import type { GuildDocument } from "../guilds/guild.schema";
 import { UserDocument } from "../users/user.schema";
 import { PresenceStatus } from "../types/enums";

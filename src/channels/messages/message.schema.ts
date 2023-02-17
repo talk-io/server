@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { User } from "../../../users/user.schema";
+import { User } from "../../users/user.schema";
 import { Channel } from "../channel.schema";
 import { HydratedDocument } from "mongoose";
-import { SnowflakeGenerator } from "../../../utils/generate-snowflake.util";
+import { SnowflakeGenerator } from "../../utils/generate-snowflake.util";
 
 @Schema({
   timestamps: true,

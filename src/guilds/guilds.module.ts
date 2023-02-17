@@ -5,9 +5,10 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { SocketsGateway } from "../sockets/sockets.gateway";
 import { UsersService } from "../users/users.service";
 import { jwtModule } from "../config/configuration";
+import { ChannelsModule } from "../channels/channels.module";
 
 @Module({
-  imports: [MongooseModule, jwtModule],
+  imports: [MongooseModule, ChannelsModule, jwtModule],
   controllers: [GuildsController],
   providers: [GuildsService, UsersService, SocketsGateway],
   exports: [GuildsService],

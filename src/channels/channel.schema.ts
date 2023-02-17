@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Guild } from "../guild.schema";
+import { Guild } from "../guilds/guild.schema";
 import { HydratedDocument, Model } from "mongoose";
-import { ChannelType } from "../../types/channel.type";
-import { SnowflakeGenerator } from "../../utils/generate-snowflake.util";
+import { ChannelType } from "../types/channel.type";
+import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
 
 export type ChannelDocument = HydratedDocument<Channel>;
 

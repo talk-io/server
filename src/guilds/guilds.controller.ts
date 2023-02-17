@@ -1,4 +1,12 @@
-import {BadRequestException, Body, Controller, Get, Param, Post, UseGuards} from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { CreateGuildDto } from "./dto/create-guild.dto";
 import { GuildsService } from "./guilds.service";
 import {
@@ -9,6 +17,8 @@ import { Serialize } from "../interceptors/serialize.interceptor";
 import { GuildDto } from "./dto/guild.dto";
 import { JwtAuthGuard } from "../guards/auth.guard";
 import { SocketsGateway } from "../sockets/sockets.gateway";
+import { CreateChannelDto } from "../channels/dto/create-channel.dto";
+import { ChannelsService } from "../channels/channels.service";
 
 @Controller()
 @UseGuards(JwtAuthGuard)
@@ -16,7 +26,8 @@ import { SocketsGateway } from "../sockets/sockets.gateway";
 export class GuildsController {
   constructor(
     private readonly guildsService: GuildsService,
-    private readonly socketsGateway: SocketsGateway
+    private readonly socketsGateway: SocketsGateway,
+    private readonly channelsService: ChannelsService
   ) {}
 
   @Post()
@@ -46,11 +57,19 @@ export class GuildsController {
   @Post("/:guildID/leave")
   async leave(
     @Param("guildID") guildID: string,
-    @CurrentUser() user: CurrentUserType,
+    @CurrentUser() user: CurrentUserType
   ) {
-    if(!guildID) throw new BadRequestException("Guild ID is required");
+    if (!guildID) throw new BadRequestException("Guild ID is required");
     await this.guildsService.leave(guildID, user);
 
-    this.socketsGateway.removeUserFromGuildRoom(guildID, user);
+    return this.socketsGateway.removeUserFromGuildRoom(guildID, user);
+  }
+
+  @Post("/:guildID/channels")
+  async createChannel(
+    @Param("guildID") guildID: string,
+    @Body() channel: CreateChannelDto
+  ) {
+    return this.channelsService.create(guildID, channel);
   }
 }

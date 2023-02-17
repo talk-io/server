@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Server } from "socket.io";
 import type { GuildDocument } from "../guilds/guild.schema";
-import type { ChannelDocument } from "../guilds/channels/channel.schema";
+import type { ChannelDocument } from "../channels/channel.schema";
 import { plainToInstance } from "class-transformer";
 import { UserDto } from "../users/dtos/user.dto";
 import { UsersService } from "../users/users.service";

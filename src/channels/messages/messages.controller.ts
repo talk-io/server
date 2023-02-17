@@ -10,14 +10,14 @@ import {
 } from "@nestjs/common";
 import { CreateMessageDto } from "./dto/create-message.dto";
 import { MessagesService } from "./messages.service";
-import { CurrentUser } from "../../../decorators/current-user.decorator";
-import { Serialize } from "../../../interceptors/serialize.interceptor";
+import { CurrentUser } from "../../decorators/current-user.decorator";
+import { Serialize } from "../../interceptors/serialize.interceptor";
 import { MessageDto } from "./dto/message.dto";
-import { JwtAuthGuard } from "../../../guards/auth.guard";
+import { JwtAuthGuard } from "../../guards/auth.guard";
 import { WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
-import { Events } from "../../../types/events";
-import { SocketsService } from "../../../sockets/sockets.service";
+import { Events } from "../../types/events";
+import { SocketsService } from "../../sockets/sockets.service";
 import { Channel } from "../channel.schema";
 import { plainToInstance } from "class-transformer";
 
