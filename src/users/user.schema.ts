@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { Guild } from "../guilds/guild.schema";
+import { Guild, GuildDocument, PopulatedGuild } from "../guilds/guild.schema";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
 import { PresenceStatus } from "../types/enums";
 
@@ -62,3 +62,7 @@ UserSchema.pre("save", async function (next) {
 
   next();
 });
+
+export interface PopulatedUser extends Omit<UserDocument, "guilds"> {
+  guilds: Array<PopulatedGuild>;
+}

@@ -17,8 +17,6 @@ import { UsersService } from "../users/users.service";
 import { plainToInstance } from "class-transformer";
 import { GuildUserDto } from "../users/dtos/guild-user.dto";
 import { Message } from "../channels/messages/message.schema";
-import type { GuildDocument } from "../guilds/guild.schema";
-import { UserDocument } from "../users/user.schema";
 import { PresenceStatus } from "../types/enums";
 
 const { JOIN_GUILD, LEAVE_GUILD } = Events.GuildUserEvents;
@@ -44,45 +42,47 @@ export class SocketsGateway
   async handleConnection(client: SocketWithUser): Promise<void> {
     const {
       id: clientID,
-      user: { _id: userID, status },
-      channels,
-      guilds,
+      initialRooms: { channels, guilds },
+      user,
     } = client;
 
-    this.socketsService.addUserSocket(userID, clientID);
-    client.join(channels.concat(guilds));
+    const { _id: userID, status } = user;
 
+    this.socketsService.addUserSocket(userID, clientID);
+
+    client.join(channels.concat(guilds));
     console.log("Client connected: ", clientID);
 
-    const userData = await this.socketsService.getUserInitialData(userID);
+    const guildsAndMembers = this.socketsService.guildsWithMembers(user.guilds);
 
-    const users = userData.guilds.reduce(
-      (acc, guild: GuildDocument & { members: Array<UserDocument> }) => {
-        const members = guild.members;
-        members.forEach((member) => {
-          const hasMember = acc.find((m) => m._id === member._id);
-          if (!hasMember) acc.push(member);
-        });
-        // @ts-ignore
-        guild.members = members.map((member) => member._id);
-        return acc;
-      },
-      []
-    );
+    const userEntries = Object.values(guildsAndMembers).flat();
 
-    this.io.sockets.to(clientID).emit(INIT, { userData, users });
-    this.io.sockets.to(guilds).emit(UPDATE_STATUS, userData._id, status);
+    const usersMap = new Map();
+    userEntries.forEach((user) => {
+      if (usersMap.has(user._id)) return;
+      usersMap.set(user._id, user);
+    });
+
+    this.io.sockets.to(clientID).emit(INIT, {
+      user,
+      users: [...usersMap.values()],
+      guildsWithMembers: guildsAndMembers,
+    });
+    this.io.sockets.to(guilds).emit(UPDATE_STATUS, userID, status);
   }
 
   handleDisconnect(client: SocketWithUser): void {
-    const userID = client.user._id;
-    const clientID = client.id;
+    const {
+      user: { _id: userID },
+      id: clientID,
+      initialRooms: { guilds },
+    } = client;
     this.socketsService.removeUserSocket(userID, clientID);
 
     console.log("Client disconnected: ", clientID);
     this.io.sockets
-      .to(client.guilds)
-      .emit(UPDATE_STATUS, client.user._id, PresenceStatus.Offline);
+      .to(guilds)
+      .emit(UPDATE_STATUS, userID, PresenceStatus.Offline);
   }
 
   async addUserToGuildRoom(guildID: string, user: CurrentUserType) {

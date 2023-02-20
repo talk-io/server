@@ -1,15 +1,16 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "./user.schema";
+import { PopulatedUser, User, UserDocument } from "./user.schema";
 import { Model } from "mongoose";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { LoginUserDto } from "./dtos/login-user.dto";
 import { CurrentUserType } from "../decorators/current-user.decorator";
 import { JwtService } from "@nestjs/jwt";
 import { SnowflakeGenerator } from "../utils/generate-snowflake.util";
-import { Channel, ChannelDocument } from "../channels/channel.schema";
-import { ChannelType } from "../types/channel.type";
-import { Guild, GuildDocument } from "../guilds/guild.schema";
+import { PresenceStatus } from "../types/enums";
+import { SocketsService } from "../sockets/sockets.service";
+import { plainToInstance } from "class-transformer";
+import { GuildUserDto } from "./dtos/guild-user.dto";
 
 const bcrypt = require("bcrypt");
 
@@ -19,7 +20,8 @@ export type LoggedInUser = User & { token: string };
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly socketsService: SocketsService
   ) {}
 
   async create(user: CreateUserDto): Promise<LoggedInUser> {
@@ -86,38 +88,55 @@ export class UsersService {
     return bcrypt.compare(loginData.password, user.password);
   }
 
+  async findByIDAndToken(_id: string, token: string) {
+    return this.userModel.findOne({
+      _id: _id,
+      tokens: { $in: [token] },
+    });
+  }
+
   public async verifyToken(token: string) {
     const payload = await this.jwtService.verify(token);
 
-    const res = await this.userModel.findOne({
-      _id: payload._id,
-      tokens: { $in: [token] },
-    });
+    const response = await this.findByIDAndToken(payload._id, token);
 
-    if (!res) throw new BadRequestException("Invalid token!");
+    if (!response) throw new BadRequestException("Invalid token!");
 
-    const populateRes = await res.populate({
+    return response;
+  }
+
+  async getInitialData(user: UserDocument, socketID: string) {
+    this.socketsService.addUserSocket(user._id, socketID);
+    const userWithGuilds = await user.populate({
       path: "guilds",
-      populate: {
-        path: "channels",
-      },
+      populate: [
+        "channels",
+        {
+          path: "members",
+          transform: (doc: UserDocument) => {
+            const isOnline = this.socketsService.getUserSockets(doc._id);
+            doc.status = isOnline ? doc.status : PresenceStatus.Offline;
+
+            return plainToInstance(GuildUserDto, doc.toObject(), {
+              excludeExtraneousValues: true,
+            });
+          },
+        },
+        "owner",
+      ],
     });
 
-    const user = populateRes.toObject();
-    const { guilds } = user;
+    const userPopulated = userWithGuilds.toObject<PopulatedUser>();
 
-    const channels = guilds.reduce((acc, guild) => {
-      // @ts-ignore
-      // const textChannels = guild.channels.filter(
-      //   (channel) => channel.type === ChannelType.GUILD_TEXT
-      // );
-      // @ts-ignore
-      return [...acc, ...guild.channels.map((channel) => channel._id)];
-    }, []);
+    const guilds = [];
+    const channels = [];
 
-    const guildsIDs = res.guilds;
+    userPopulated.guilds.forEach((guild) => {
+      guilds.push(guild._id);
+      guild.channels.forEach((channel) => channels.push(channel._id));
+    });
 
-    return { user, channels, guilds: guildsIDs };
+    return { user: userPopulated, rooms: { channels, guilds } };
   }
 
   private async _generateDiscriminator(username) {

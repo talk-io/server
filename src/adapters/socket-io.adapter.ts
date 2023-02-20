@@ -35,12 +35,16 @@ const verifyUserMiddleware =
       const [_, token] = authorization.split(" ");
       if (!token) next(new WsException("Unauthorized"));
 
-      const data = await usersService.verifyToken(token);
-      if (!data) next(new WsException("Unauthorized"));
+      const user = await usersService.verifyToken(token);
+      if (!user) next(new WsException("Unauthorized"));
 
-      // @ts-ignore
-      socket.user = data.user;
-      socket.channels = data.channels;
+      const { user: initialUser, rooms } = await usersService.getInitialData(
+        user,
+        socket.id
+      );
+
+      socket.user = initialUser;
+      socket.initialRooms = rooms;
 
       next();
     } catch (e) {

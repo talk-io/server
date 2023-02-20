@@ -41,6 +41,12 @@ export class Guild {
 
 export const GuildSchema = SchemaFactory.createForClass(Guild);
 
+export interface PopulatedGuild extends Guild {
+  channels: ChannelDocument[];
+  members: UserDocument[];
+  owner: UserDocument;
+}
+
 GuildSchema.virtual("channels", {
   ref: "Channel",
   localField: "_id",
