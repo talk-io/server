@@ -26,11 +26,17 @@ export class UsersService {
 
   async create(user: CreateUserDto): Promise<LoggedInUser> {
     const users = await this.userModel.find({ email: user.email });
-    if (users.length) throw new BadRequestException("Email is already in use!");
+    if (users.length)
+      throw new BadRequestException({
+        email: "Email is already in use!",
+      });
 
     const newUser = new this.userModel(user);
     const discriminator = await this._generateDiscriminator(user.username);
-    if (!discriminator) throw new BadRequestException("Username is overused!");
+    if (!discriminator)
+      throw new BadRequestException({
+        username: "Username is overused!",
+      });
 
     newUser.discriminator = discriminator;
 
