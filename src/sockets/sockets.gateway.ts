@@ -48,7 +48,7 @@ export class SocketsGateway
 
     const { _id: userID, status } = user;
 
-    this.socketsService.addUserSocket(userID, clientID);
+    // this.socketsService.addUserSocket(userID, clientID);
 
     client.join(channels.concat(guilds));
     console.log("Client connected: ", clientID);
@@ -68,6 +68,9 @@ export class SocketsGateway
       users: [...usersMap.values()],
       guildsWithMembers: guildsAndMembers,
     });
+    console.log({
+      weee: this.socketsService.getUserSockets("3047579137902231553"),
+    });
     this.io.sockets.to(guilds).emit(UPDATE_STATUS, userID, status);
   }
 
@@ -77,6 +80,7 @@ export class SocketsGateway
       id: clientID,
       initialRooms: { guilds },
     } = client;
+
     this.socketsService.removeUserSocket(userID, clientID);
 
     console.log("Client disconnected: ", clientID);
