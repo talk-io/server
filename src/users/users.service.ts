@@ -29,7 +29,10 @@ export class UsersService {
     if (users.length) throw new BadRequestException("Email is already in use!");
 
     const newUser = new this.userModel(user);
-    newUser.discriminator = await this._generateDiscriminator(user.username);
+    const discriminator = await this._generateDiscriminator(user.username);
+    if (!discriminator) throw new BadRequestException("Username is overused!");
+
+    newUser.discriminator = discriminator;
 
     newUser._id = new SnowflakeGenerator().generateSnowflake();
     console.log(newUser._id);
@@ -140,6 +143,8 @@ export class UsersService {
   }
 
   private async _generateDiscriminator(username) {
+    const timesUsernameUsed = await this.userModel.countDocuments({ username });
+    if (timesUsernameUsed === 9998) return false;
     const generate = () => Math.floor(Math.random() * (9999 - 1000) + 1000);
     const userExists = async (discriminator: number) =>
       this.userModel.find({ username, discriminator });
